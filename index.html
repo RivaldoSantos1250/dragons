@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dragons</title>
+  <style>
+    @font-face {
+      font-family: 'ValorantFont';
+      src: url('Valorant Font.ttf') format('truetype');
+    }
+
+    body {
+      font-family: 'ValorantFont', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-image: url('dragons.jpg');
+      background-size: cover; 
+      background-position: center; 
+      background-repeat: no-repeat;
+    }
+
+    header {
+      background-color: #3333338c;
+      color: #fff;
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    main {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+    }
+
+    .player {
+      margin-top: 170px;
+      text-align: center;
+      position: relative;
+      transition: all 0.5s ease-in-out;
+      width: 100%;
+      max-width: 800px; 
+      display: block; 
+    }
+
+    
+
+    .player img {
+        border: 5px solid #51ff00a8;
+      width: 800px; 
+      height: 500px; 
+      border-radius: 20px;
+      object-fit: cover;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .player .info {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: #fff;
+      padding: 10px;
+      border-radius: 10px;
+      height: 200px;
+    }
+
+    .player .name {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 40px;
+      text-transform: uppercase;
+      animation: slideName 1.5s ease-out;
+      color: rgb(255, 0, 0);
+      
+    }
+
+    .player .agent,
+    .player .class {
+      font-size: 16px;
+      font-style: italic;
+      animation: slideInfo 1.5s ease-out;
+      color: rgb(255, 255, 255);
+    }
+
+    .duelista {
+      background-color: #ff0000;
+    }
+
+    .player:hover {
+      transform: scale(1.1);
+    }
+
+    @keyframes slideName {
+      0% {
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideInfo {
+      0% {
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .player .status {
+  position: absolute; 
+  top: 0; 
+  right: 0; 
+  text-align: right; 
+  color: #51ff00; 
+  padding: 10px; 
+  opacity: 0; 
+  animation: appear 1s ease forwards; 
+  animation-delay: 1s; 
+}
+
+@keyframes appear {
+  from {
+    opacity: 0; 
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Dragons</h1>
+  </header>
+  <main>
+    <div id="marcinho" class="player">
+        <img src="https://64.media.tumblr.com/87434378350d5a44e9bbce6b094155e4/05082fe5ebb4ab2a-c0/s540x810/5305f9996c3e96b2760778ce198e88e1c05bb26d.gif" alt="Marcinho - Duelista">
+        <div class="info">
+          <p class="name">Marcinho</p>
+          <p class="agent">Agente: Sage</p>
+          <p class="class">Classe: Sentinela</p>
+        </div>
+        <div class="status">
+          <p>Damage/Round: ?</p>
+          <p>K/D Ratio: ?</p>
+          <p>Headshot %: ?</p>
+          <p>Win %: ?</p>
+        </div>
+      </div>
+      
+    <div id="nicemk" class="player">
+        <img src="https://media1.tenor.com/m/S52u7qmATOkAAAAC/cypher-cypher-valorant.gif" alt="Nicemk - Duelista">
+        <div class="info">
+          <p class="name">Nicemk</p>
+          <p class="agent">Agente: Cypher</p>
+          <p class="class">Classe: Sentinela</p>
+        </div>
+        <div class="status">
+            <p>Damage/Round: 163.6</p>
+            <p>K/D Ratio: 1.06</p>
+            <p>Headshot %: 16.6%</p>
+            <p>Win %: 47.1%</p>
+          </div>
+      </div>
+      <div id="silence" class="player">
+        <img src="https://media1.tenor.com/m/rkPKFm0AtvsAAAAC/sova-valorant.gif" alt="Silence - Duelista">
+        <div class="info">
+          <p class="name">Silence</p>
+          <p class="agent">Agente: Sova</p>
+          <p class="class">Classe: Iniciador</p>
+        </div>
+        <div class="status">
+            <p>Damage/Round: 122.9</p>
+            <p>K/D Ratio: 0.94</p>
+            <p>Headshot %: 16.2%</p>
+            <p>Win %: 55.1%</p>
+          </div>
+      </div>
+      <div id="mistyc" class="player">
+        <img src="https://media1.tenor.com/m/iHeaZNItkCMAAAAC/what-happened-raze.gif" alt="Mistyc - Duelista">
+        <div class="info">
+          <p class="name">Mistyc</p>
+          <p class="agent">Agente: Raze</p>
+          <p class="class">Classe: Duelista</p>
+        </div>
+        <div class="status">
+            <p>Damage/Round: 163.6</p>
+            <p>K/D Ratio: 1.06</p>
+            <p>Headshot %: 16.6%</p>
+            <p>Win %: 47.1%</p>
+          </div>
+      </div>
+      <div id="midora" class="player">
+        <img src="https://img3.pillowfort.social/posts/32ceda568b6203519e21.gif" alt="Midora - Duelista">
+        <div class="info">
+          <p class="name">Midora</p>
+          <p class="agent">Agente: Jett</p>
+          <p class="class">Classe: Duelista</p>
+        </div>
+        <div class="status">
+            <p>Damage/Round: 119.3</p>
+            <p>K/D Ratio: 0.80</p>
+            <p>Headshot %: 19.2%</p>
+            <p>Win %: 44.4%</p>
+          </div>
+      </div>
+  
+      <div id="yuzuk" class="player">
+        <img src="https://media1.tenor.com/m/4b3iXnTJRBkAAAAd/valorant-skye.gif" alt="Yuzuk - Duelista">
+        <div class="info">
+          <p class="name">Yuzuk</p>
+          <p class="agent">Agente: Skye</p>
+          <p class="class">Classe: Iniciadora</p>
+        </div>
+        <div class="status">
+            <p>Damage/Round: 117.4</p>
+            <p>K/D Ratio: 0.79</p>
+            <p>Headshot %: 26.0%</p>
+            <p>Win %: 61.5%</p>
+          </div>
+      </div>
+  
+      <div id="dark" class="player">
+          <img src="https://media1.tenor.com/m/gXZNSfLz1oIAAAAd/casting-paranoia-omen.gif" alt="Dark - Duelista">
+          <div class="info">
+            <p class="name">Dark</p>
+            <p class="agent">Agente: Omen</p>
+            <p class="class">Classe: Controlador</p>
+          </div>
+          <div class="status">
+            <p>Damage/Round: 162.5</p>
+            <p>K/D Ratio: 1.29</p>
+            <p>Headshot %: 18.7%</p>
+            <p>Win %: 42.9%</p>
+          </div>
+        </div>
+  </main>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const players = document.querySelectorAll('.player');
+      let index = players.length - 6; 
+
+      function showPlayer() {
+        players.forEach(player => {
+          player.style.display = 'none';
+        });
+
+        for (let i = index; i < index + 1; i++) {
+          players[i % players.length].style.display = 'block';
+        }
+
+        index = (index + 1) % players.length;
+      }
+
+      showPlayer(); 
+      setInterval(showPlayer, 6000); 
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+  var disclaimer =  document.querySelector("img[alt='www.000webhost.com']");
+   if(disclaimer){
+       disclaimer.remove();
+   }  
+ });
+  </script>
+</body>
+</html>
