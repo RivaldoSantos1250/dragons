@@ -3,274 +3,354 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dragons</title>
+  <title>Dragons - A.R.C. INTERFACE [ULTIMATE]</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
   <style>
     @font-face {
       font-family: 'ValorantFont';
       src: url('Valorant Font.ttf') format('truetype');
     }
-
+    :root {
+      --valorant-red: #ff4655;
+      --valorant-dark: #0a1018;
+      --valorant-light: #ece8e1;
+      --valorant-secondary: #7f8c9b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'ValorantFont', Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-image: url('dragons.jpg');
-      background-size: cover; 
-      background-position: center; 
-      background-repeat: no-repeat;
+      background-color: var(--valorant-dark);
+      color: var(--valorant-light);
+      overflow: hidden;
+      min-height: 100vh;
+    }
+    .scanlines {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.02) 50%, rgba(255,255,255,0) 100%);
+        background-size: 100% 4px;
+        z-index: 10;
+        pointer-events: none;
+        animation: scan 0.2s linear infinite;
+    }
+    @keyframes scan {
+        from { background-position: 0 0; }
+        to { background-position: 0 4px; }
+    }
+    #particles-js { position: fixed; width: 100%; height: 100%; z-index: -2; }
+    #video-bg {
+      position: fixed; top: 50%; left: 50%; min-width: 100%; min-height: 100%;
+      width: auto; height: auto; z-index: -3; transform: translateX(-50%) translateY(-50%);
+      opacity: 0.1; filter: blur(3px);
+    }
+    .main-container {
+        display: none;
+        flex-direction: column; align-items: center; justify-content: center;
+        min-height: 100vh; padding: 20px;
+        animation: fadeInContainer 1s forwards 4.5s;
+    }
+    @keyframes fadeInContainer { to { opacity: 1; } }
+
+    #loading-screen {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: var(--valorant-dark); z-index: 100;
+      display: flex; align-items: center; justify-content: center;
+      font-family: monospace; font-size: 1.5em;
+    }
+    .loading-text span { opacity: 0; animation: fadeIn 0.1s forwards; }
+    @keyframes fadeIn { to { opacity: 1; } }
+
+    header h1 {
+      font-size: 3.5em; text-transform: uppercase; color: var(--valorant-light);
+      text-shadow: 0 0 15px var(--valorant-red); margin-bottom: 50px; text-align: center;
     }
 
-    header {
-      background-color: #3333338c;
-      color: #fff;
-      text-align: center;
-      padding: 20px 0;
-    }
-
-    main {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-around;
+    .player-details-container {
+        width: 100%; max-width: 1200px; height: 60vh;
+        max-height: 520px; position: relative;
     }
 
     .player {
-      margin-top: 170px;
-      text-align: center;
-      position: relative;
-      transition: all 0.5s ease-in-out;
-      width: 100%;
-      max-width: 800px; 
-      display: block; 
+        position: absolute; top: 0; left: 0;
+        width: 100%; height: 100%;
+        display: grid; grid-template-columns: 45% 55%;
+        align-items: center; gap: 30px;
+        opacity: 0; visibility: hidden;
+        transition: opacity 0.4s ease, visibility 0s linear 0.4s;
     }
-
+    .player.active {
+        opacity: 1; visibility: visible; transition-delay: 0.4s;
+    }
+    .player.glitching-out { animation: glitchOut 0.4s forwards; }
+    @keyframes glitchOut {
+        0% { opacity: 1; transform: none; }
+        50% { opacity: 0.3; transform: translateX(10px) skewX(-5deg); }
+        100% { opacity: 0; transform: translateX(-20px) skewX(10deg); visibility: hidden; }
+    }
     
-
-    .player img {
-        border: 5px solid #51ff00a8;
-      width: 800px; 
-      height: 500px; 
-      border-radius: 20px;
-      object-fit: cover;
-      overflow: hidden;
-      margin-bottom: 10px;
+    .player .visual {
+        position: relative; width: 100%; height: 100%;
+        border-radius: 5px; overflow: hidden;
+    }
+    .player .visual img {
+      width: 100%; height: 100%; object-fit: cover;
+      clip-path: polygon(0 0, 85% 0, 100% 100%, 0% 100%);
     }
 
-    .player .info {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background-color: rgba(0, 0, 0, 0.7);
-      color: #fff;
-      padding: 10px;
-      border-radius: 10px;
-      height: 200px;
+    /* HUD OVERLAY */
+    .hud-overlay {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none;
     }
-
-    .player .name {
-      font-size: 24px;
-      font-weight: bold;
-      margin-bottom: 40px;
-      text-transform: uppercase;
-      animation: slideName 1.5s ease-out;
-      color: rgb(255, 0, 0);
-      
+    .hud-reticle {
+        position: absolute; top: 50%; left: 40%;
+        width: 80px; height: 80px;
+        border: 1px solid var(--valorant-red);
+        transform: translate(-50%, -50%) rotate(45deg);
+        animation: reticlePulse 3s infinite ease-in-out;
     }
-
-    .player .agent,
-    .player .class {
-      font-size: 16px;
-      font-style: italic;
-      animation: slideInfo 1.5s ease-out;
-      color: rgb(255, 255, 255);
+    .hud-reticle::before, .hud-reticle::after {
+        content: ''; position: absolute; background: var(--valorant-red);
     }
+    .hud-reticle::before { width: 100%; height: 1px; top: 50%; left: 0; }
+    .hud-reticle::after { height: 100%; width: 1px; left: 50%; top: 0; }
+    @keyframes reticlePulse { 50% { transform: translate(-50%, -50%) rotate(45deg) scale(1.1); } }
 
-    .duelista {
-      background-color: #ff0000;
+    .player .details {
+        display: flex; flex-direction: column; justify-content: center;
+        height: 100%; padding: 30px;
+        border-radius: 5px;
+        background: rgba(15, 25, 35, 0.6);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
-
-    .player:hover {
-      transform: scale(1.1);
+    
+    .player .name { font-size: 4em; color: var(--valorant-red); text-transform: uppercase; line-height: 1; }
+    .player .agent { font-size: 1.6em; margin-top: 10px; color: var(--valorant-secondary); }
+    
+    .stats-container {
+        display: grid; grid-template-columns: 1fr 1fr;
+        gap: 25px; align-items: start; margin-top: 25px;
     }
-
-    @keyframes slideName {
-      0% {
-        transform: translateY(-100%);
-        opacity: 0;
-      }
-      100% {
-        transform: translateY(0);
-        opacity: 1;
-      }
+    .chart-container { max-width: 300px; }
+    .abilities h3 {
+        font-size: 1.3em; color: var(--valorant-red);
+        border-bottom: 2px solid var(--valorant-red);
+        margin-bottom: 18px; padding-bottom: 8px;
     }
-
-    @keyframes slideInfo {
-      0% {
-        transform: translateY(-100%);
-        opacity: 0;
-      }
-      100% {
-        transform: translateY(0);
-        opacity: 1;
-      }
+    .abilities span { display: block; font-family: monospace; font-size: 1.15em; margin-bottom: 6px; }
+    
+    .lineup {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 18px; z-index: 20;
     }
-
-    .player .status {
-  position: absolute; 
-  top: 0; 
-  right: 0; 
-  text-align: right; 
-  color: #51ff00; 
-  padding: 10px; 
-  opacity: 0; 
-  animation: appear 1s ease forwards; 
-  animation-delay: 1s; 
-}
-
-@keyframes appear {
-  from {
-    opacity: 0; 
-  }
-  to {
-    opacity: 1;
-  }
-}
-
+    .lineup-avatar {
+      width: 70px; height: 70px; border-radius: 50%;
+      border: 3px solid var(--valorant-light); cursor: pointer;
+      transition: all 0.3s ease;
+      background-size: cover; background-position: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+    .lineup-avatar:hover {
+      transform: scale(1.15) translateY(-5px);
+      border-color: var(--valorant-red); box-shadow: 0 8px 25px var(--valorant-red);
+    }
+    .lineup-avatar.selected {
+      transform: scale(1.2) translateY(-5px);
+      border-color: var(--valorant-red); box-shadow: 0 0 25px var(--valorant-red);
+    }
   </style>
-</head>
-<body>
-  <header>
-    <h1>Dragons</h1>
-  </header>
-  <main>
-    <div id="marcinho" class="player">
-        <img src="https://64.media.tumblr.com/87434378350d5a44e9bbce6b094155e4/05082fe5ebb4ab2a-c0/s540x810/5305f9996c3e96b2760778ce198e88e1c05bb26d.gif" alt="Marcinho - Duelista">
-        <div class="info">
-          <p class="name">Marcinho</p>
-          <p class="agent">Agente: Sage</p>
-          <p class="class">Classe: Sentinela</p>
-        </div>
-        <div class="status">
-          <p>Damage/Round: 125.8</p>
-          <p>K/D Ratio: 0.97</p>
-          <p>Headshot %: 12.1%</p>
-          <p>Win %: 48.0%</p>
-        </div>
-      </div>
-      
-    <div id="nicemk" class="player">
-        <img src="https://media1.tenor.com/m/S52u7qmATOkAAAAC/cypher-cypher-valorant.gif" alt="Nicemk - Duelista">
-        <div class="info">
-          <p class="name">Nicemk</p>
-          <p class="agent">Agente: Cypher</p>
-          <p class="class">Classe: Sentinela</p>
-        </div>
-        <div class="status">
-            <p>Damage/Round: 163.6</p>
-            <p>K/D Ratio: 1.06</p>
-            <p>Headshot %: 16.6%</p>
-            <p>Win %: 47.1%</p>
-          </div>
-      </div>
-      <div id="silence" class="player">
-        <img src="https://media1.tenor.com/m/rkPKFm0AtvsAAAAC/sova-valorant.gif" alt="Silence - Duelista">
-        <div class="info">
-          <p class="name">Silence</p>
-          <p class="agent">Agente: Sova</p>
-          <p class="class">Classe: Iniciador</p>
-        </div>
-        <div class="status">
-            <p>Damage/Round: 122.9</p>
-            <p>K/D Ratio: 0.94</p>
-            <p>Headshot %: 16.2%</p>
-            <p>Win %: 55.1%</p>
-          </div>
-      </div>
-      <div id="mistyc" class="player">
-        <img src="https://media1.tenor.com/m/iHeaZNItkCMAAAAC/what-happened-raze.gif" alt="Mistyc - Duelista">
-        <div class="info">
-          <p class="name">Mistyc</p>
-          <p class="agent">Agente: Raze</p>
-          <p class="class">Classe: Duelista</p>
-        </div>
-        <div class="status">
-            <p>Damage/Round: 163.6</p>
-            <p>K/D Ratio: 1.06</p>
-            <p>Headshot %: 16.6%</p>
-            <p>Win %: 47.1%</p>
-          </div>
-      </div>
-      <div id="midora" class="player">
-        <img src="https://img3.pillowfort.social/posts/32ceda568b6203519e21.gif" alt="Midora - Duelista">
-        <div class="info">
-          <p class="name">Midora</p>
-          <p class="agent">Agente: Jett</p>
-          <p class="class">Classe: Duelista</p>
-        </div>
-        <div class="status">
-            <p>Damage/Round: 119.3</p>
-            <p>K/D Ratio: 0.80</p>
-            <p>Headshot %: 19.2%</p>
-            <p>Win %: 44.4%</p>
-          </div>
-      </div>
+ </head>
+ <body>
+
+  <div class="scanlines"></div>
+  <div id="particles-js"></div>
+  <div id="video-bg">
+    <video playsinline autoplay muted loop poster="dragons.jpg"></video>
+  </div>
+
+  <div id="loading-screen">
+    <div class="loading-text"></div>
+  </div>
+
+  <div class="main-container">
+    <header><h1>Análise de Operadores</h1></header>
+    <div class="player-details-container"></div>
+    <div class="lineup"></div>
+  </div>
   
-      <div id="yuzuk" class="player">
-        <img src="https://media1.tenor.com/m/4b3iXnTJRBkAAAAd/valorant-skye.gif" alt="Yuzuk - Duelista">
-        <div class="info">
-          <p class="name">Yuzuk</p>
-          <p class="agent">Agente: Skye</p>
-          <p class="class">Classe: Iniciadora</p>
-        </div>
-        <div class="status">
-            <p>Damage/Round: 117.4</p>
-            <p>K/D Ratio: 0.79</p>
-            <p>Headshot %: 26.0%</p>
-            <p>Win %: 61.5%</p>
-          </div>
-      </div>
+  <audio id="background-music" loop src="Summit.mp3"></audio> 
   
-      <div id="dark" class="player">
-          <img src="https://media1.tenor.com/m/gXZNSfLz1oIAAAAd/casting-paranoia-omen.gif" alt="Dark - Duelista">
-          <div class="info">
-            <p class="name">Dark</p>
-            <p class="agent">Agente: Omen</p>
-            <p class="class">Classe: Controlador</p>
-          </div>
-          <div class="status">
-            <p>Damage/Round: 162.5</p>
-            <p>K/D Ratio: 1.29</p>
-            <p>Headshot %: 18.7%</p>
-            <p>Win %: 42.9%</p>
-          </div>
-        </div>
-  </main>
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      const players = document.querySelectorAll('.player');
-      let index = players.length - 6; 
+    const playerData = {
+      marcinho: { name: 'Marcinho', agent: 'Sage', class: 'Sentinela', gif: 'https://64.media.tumblr.com/87434378350d5a44e9bbce6b094155e4/05082fe5ebb4ab2a-c0/s540x810/5305f9996c3e96b2760778ce198e88e1c05bb26d.gif', stats: { 'DANO': 125.8, 'K/D': 0.97, 'HS%': 12.1, 'WIN%': 48.0 }, abilities: { q: 'Orbe de Lentidão', e: 'Orbe Curativo', x: 'Ressurreição'} },
+      nicemk: { name: 'Nicemk', agent: 'Cypher', class: 'Sentinela', gif: 'https://media1.tenor.com/m/S52u7qmATOkAAAAC/cypher-cypher-valorant.gif', stats: { 'DANO': 163.6, 'K/D': 1.06, 'HS%': 16.6, 'WIN%': 47.1 }, abilities: { q: 'Jaula Cibernética', e: 'Câmera', x: 'Assalto Neural'} },
+      silence: { name: 'Silence', agent: 'Sova', class: 'Iniciador', gif: 'https://media1.tenor.com/m/rkPKFm0AtvsAAAAC/sova-valorant.gif', stats: { 'DANO': 122.9, 'K/D': 0.94, 'HS%': 16.2, 'WIN%': 55.1 }, abilities: { q: 'Flecha de Choque', e: 'Flecha Rastreadora', x: 'Fúria do Caçador'} },
+      mistyc: { name: 'Mistyc', agent: 'Raze', class: 'Duelista', gif: 'https://media1.tenor.com/m/iHeaZNItkCMAAAAC/what-happened-raze.gif', stats: { 'DANO': 163.6, 'K/D': 1.06, 'HS%': 16.6, 'WIN%': 47.1 }, abilities: { q: 'Carga de Explosivos', e: 'Cartuchos de Tinta', x: 'Estraga-prazeres'} },
+      midora: { name: 'Midora', agent: 'Jett', class: 'Duelista', gif: 'https://img3.pillowfort.social/posts/32ceda568b6203519e21.gif', stats: { 'DANO': 119.3, 'K/D': 0.80, 'HS%': 19.2, 'WIN%': 44.4 }, abilities: { q: 'Corrente Asc.', e: 'Brisa de Impulso', x: 'Tormenta de Aço'} },
+      yuzuk: { name: 'Yuzuk', agent: 'Skye', class: 'Iniciadora', gif: 'https://media1.tenor.com/m/4b3iXnTJRBkAAAAd/valorant-skye.gif', stats: { 'DANO': 117.4, 'K/D': 0.79, 'HS%': 26.0, 'WIN%': 61.5 }, abilities: { q: 'Predador Exp.', e: 'Luz Desbravadora', x: 'Rastreadores'} },
+      dark: { name: 'Dark', agent: 'Omen', class: 'Controlador', gif: 'https://media1.tenor.com/m/gXZNSfLz1oIAAAAd/casting-paranoia-omen.gif', stats: { 'DANO': 162.5, 'K/D': 1.29, 'HS%': 18.7, 'WIN%': 42.9 }, abilities: { q: 'Paranoia', e: 'Manto Sombrio', x: 'Salto das Sombras'} }
+    };
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        const lineupContainer = document.querySelector('.lineup');
+        const playerContainer = document.querySelector('.player-details-container');
+        const chartInstances = {};
+        let activePlayerKey = null;
 
-      function showPlayer() {
-        players.forEach(player => {
-          player.style.display = 'none';
-        });
+        // --- 1. GERAÇÃO INICIAL ---
+        for (const playerKey in playerData) {
+            const data = playerData[playerKey];
+            const playerCard = document.createElement('div');
+            playerCard.className = 'player';
+            playerCard.id = `player-card-${playerKey}`;
+            playerCard.innerHTML = `
+                <div class="visual">
+                    <img src="${data.gif}" alt="${data.name}">
+                    <div class="hud-overlay"><div class="hud-reticle"></div></div>
+                </div>
+                <div class="details">
+                    <p class="name">${data.name}</p>
+                    <p class="agent">${data.agent} / ${data.class}</p>
+                    <div class="stats-container">
+                        <div class="abilities">
+                            <h3>Habilidades</h3>
+                            ${Object.values(data.abilities).map(ability => `<span>- ${ability}</span>`).join('')}
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="chart-${playerKey}"></canvas>
+                        </div>
+                    </div>
+                </div>`;
+            playerContainer.appendChild(playerCard);
 
-        for (let i = index; i < index + 1; i++) {
-          players[i % players.length].style.display = 'block';
+            const avatar = document.createElement('div');
+            avatar.className = 'lineup-avatar';
+            avatar.dataset.player = playerKey;
+            avatar.style.backgroundImage = `url(${data.gif})`;
+            avatar.addEventListener('click', () => switchPlayer(playerKey));
+            lineupContainer.appendChild(avatar);
         }
 
-        index = (index + 1) % players.length;
+        // --- 2. FUNÇÃO PARA TROCAR DE JOGADOR COM ANIMAÇÃO ---
+        function switchPlayer(newPlayerKey) {
+            if (newPlayerKey === activePlayerKey) return;
+
+            const oldPlayerCard = document.getElementById(`player-card-${activePlayerKey}`);
+            if (oldPlayerCard) {
+                oldPlayerCard.classList.add('glitching-out');
+                oldPlayerCard.addEventListener('animationend', () => {
+                    oldPlayerCard.classList.remove('active', 'glitching-out');
+                }, { once: true });
+            }
+
+            activePlayerKey = newPlayerKey;
+
+            setTimeout(() => {
+                showPlayer(newPlayerKey);
+            }, 200);
+        }
+
+        // --- 3. FUNÇÃO PARA MOSTRAR JOGADOR E CRIAR GRÁFICO ---
+        function showPlayer(playerKey) {
+            document.querySelectorAll('.lineup-avatar').forEach(a => a.classList.remove('selected'));
+            
+            const playerCard = document.getElementById(`player-card-${playerKey}`);
+            const avatar = document.querySelector(`.lineup-avatar[data-player="${playerKey}"]`);
+            playerCard.classList.add('active');
+            avatar.classList.add('selected');
+
+            if (chartInstances[playerKey]) {
+                chartInstances[playerKey].destroy();
+            }
+            createRadarChart(playerKey);
+        }
+
+        // --- 4. FUNÇÃO DE GRÁFICO ---
+        function createRadarChart(playerKey) {
+            const data = playerData[playerKey];
+            const ctx = document.getElementById(`chart-${playerKey}`).getContext('2d');
+            const maxValues = { 'DANO': 180, 'K/D': 1.5, 'HS%': 30, 'WIN%': 100 };
+            const labels = Object.keys(data.stats);
+            const normalizedData = labels.map(label => (data.stats[label] / maxValues[label]) * 100);
+
+            chartInstances[playerKey] = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: data.name,
+                        data: normalizedData,
+                        backgroundColor: 'rgba(255, 70, 85, 0.4)',
+                        borderColor: 'rgba(255, 70, 85, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(255, 70, 85, 1)',
+                        pointRadius: 4,
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    animation: { duration: 1000, easing: 'easeOutQuint' },
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(236, 232, 225, 0.2)' },
+                            grid: { color: 'rgba(236, 232, 225, 0.2)' },
+                            pointLabels: { color: '#ece8e1', font: { family: "'ValorantFont', Arial, sans-serif", size: 14 }},
+                            ticks: { display: false, max: 100, min: 0, stepSize: 25 }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- 5. TELA DE LOADING E INICIALIZAÇÃO ---
+        const loadingText = document.querySelector('.loading-text');
+        const lines = ["Acessando Banco de Dados DRAGONS...", "Analisando Operadores...", "Briefing Tático Carregado."];
+        let lineIndex = 0; let charIndex = 0;
+        function typeLine() {
+          if (lineIndex < lines.length) {
+              if (charIndex < lines[lineIndex].length) {
+                  loadingText.innerHTML += `<span>${lines[lineIndex].charAt(charIndex)}</span>`;
+                  charIndex++; setTimeout(typeLine, 30);
+              } else {
+                  loadingText.innerHTML += '<br>';
+                  lineIndex++; charIndex = 0; setTimeout(typeLine, 500);
+              }
+          } else {
+            setTimeout(() => {
+                const loadingScreen = document.getElementById('loading-screen');
+                loadingScreen.style.transition = 'opacity 1s';
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                    document.querySelector('.main-container').style.display = 'flex';
+                    activePlayerKey = Object.keys(playerData)[0];
+                    showPlayer(activePlayerKey);
+
+                    // LÓGICA DA MÚSICA
+                    const music = document.getElementById('background-music');
+                    music.volume = 0.3; // Definir um volume agradável
+                    
+                    // Tenta tocar a música. Se falhar, espera por um clique do utilizador.
+                    let promise = music.play();
+                    if (promise !== undefined) {
+                        promise.catch(error => {
+                            console.log("Autoplay bloqueado, à espera de interação do utilizador.");
+                            document.body.addEventListener('click', () => music.play(), { once: true });
+                        });
+                    }
+                }, 1000);
+            }, 500);
+          }
       }
+      typeLine();
 
-      showPlayer(); 
-      setInterval(showPlayer, 6000); 
+      particlesJS('particles-js',
+        {"particles":{"number":{"value":80,"density":{"enable":true,"value_area":800}},"color":{"value":"#ff4655"},"shape":{"type":"circle"},"opacity":{"value":0.5,"random":true},"size":{"value":3,"random":true},"line_linked":{"enable":false},"move":{"enable":true,"speed":2,"direction":"none","random":true,"straight":false,"out_mode":"out","bounce":false}},"interactivity":{"detect_on":"canvas","events":{"onhover":{"enable":true,"mode":"repulse"},"onclick":{"enable":true,"mode":"push"}},"modes":{"repulse":{"distance":60},"push":{"particles_nb":4}}},"retina_detect":true}
+      );
     });
-
-    document.addEventListener('DOMContentLoaded', () => {
-  var disclaimer =  document.querySelector("img[alt='www.000webhost.com']");
-   if(disclaimer){
-       disclaimer.remove();
-   }  
- });
   </script>
-</body>
-</html>
+ </body>
+ </html>
