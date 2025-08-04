@@ -56,113 +56,185 @@
         width: 150px; height: 150px;
         border: 2px solid var(--accent-color);
         border-radius: 50%;
-        position: relative;
-        animation: rotate 20s linear infinite;
+        border-top-color: transparent;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
     }
-    .loader-ring::before {
-        content: ''; position: absolute;
-        width: 110%; height: 110%; top: -5%; left: -5%;
-        border: 2px solid var(--accent-color);
-        border-radius: 50%;
-        opacity: 0.5;
-    }
-    @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
     #loading-text {
-        margin-top: 20px; font-size: 1.2em;
-        text-shadow: 0 0 5px var(--accent-color);
-    }
-    #start-button {
-        display: none; font-family: 'ValorantFont', Arial, sans-serif;
-        font-size: 1.2em; color: var(--accent-color); background: transparent;
-        border: 2px solid var(--accent-color); padding: 10px 20px;
-        margin-top: 30px; cursor: pointer; text-transform: uppercase;
-        animation: pulse 1.5s infinite;
-        text-shadow: 0 0 10px var(--accent-color);
-    }
-    @keyframes pulse {
-        50% { transform: scale(1.05); box-shadow: 0 0 25px var(--accent-color); }
+        font-size: 1.2em;
+        letter-spacing: 2px;
     }
 
-    header h1 {
-      font-size: 3.5em; text-transform: uppercase;
-      text-shadow: 0 0 15px var(--accent-color); margin-bottom: 50px;
-      transition: text-shadow 0.5s ease;
+    #start-button {
+        display: none;
+        margin-top: 30px;
+        padding: 10px 25px;
+        font-family: 'ValorantFont', Arial, sans-serif;
+        font-size: 1.5em;
+        background: transparent;
+        color: var(--accent-color);
+        border: 2px solid var(--accent-color);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        letter-spacing: 1px;
+    }
+    #start-button:hover {
+        background: var(--accent-color);
+        color: var(--dark-color);
+        box-shadow: 0 0 15px var(--accent-color);
+    }
+
+    header {
+      width: 100%;
+      text-align: center;
+      padding: 20px;
+      margin-bottom: 20px;
+      animation: slideDown 0.8s forwards;
+    }
+
+    @keyframes slideDown {
+        from { transform: translateY(-100px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    h1 {
+      font-size: 2.5em;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: var(--accent-color);
+      text-shadow: 0 0 10px var(--accent-color);
     }
 
     .player-details-container {
-        width: 100%; max-width: 1200px; height: 60vh;
-        max-height: 520px; position: relative;
-        perspective: 1500px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      max-width: 1200px;
     }
 
     .player {
-        position: absolute; top: 0; left: 0;
-        width: 100%; height: 100%;
-        display: grid; grid-template-columns: 45% 55%;
-        align-items: center; gap: 30px;
-        opacity: 0;
-        transform: rotateY(-30deg) scale(0.9);
-        transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.8s ease;
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      width: 100%;
+      height: 600px;
+      position: relative;
+      opacity: 0;
+      transform: translateY(50px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
     }
+
     .player.active {
         opacity: 1;
-        transform: rotateY(0) scale(1);
+        transform: translateY(0);
     }
-    
+
+
     .player .visual {
-        width: 100%; height: 100%;
-        border-radius: 5px; overflow: hidden;
+      width: 100%;
+      height: 100%;
+      border-radius: 5px;
+      overflow: hidden;
     }
+
     .player .visual img {
-      width: 100%; height: 100%; object-fit: cover;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
       clip-path: polygon(0 0, 85% 0, 100% 100%, 0% 100%);
     }
 
     .player .details {
-        display: flex; flex-direction: column; justify-content: center;
-        height: 100%; padding: 30px; border-radius: 5px;
-        background: rgba(15, 25, 35, 0.6); backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      padding: 30px;
+      border-radius: 5px;
+      background: rgba(15, 25, 35, 0.6);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
-    
-    .player .name { font-size: 4em; color: var(--accent-color); text-transform: uppercase; line-height: 1; transition: color 0.5s ease; }
-    .player .agent { font-size: 1.6em; margin-top: 10px; }
-    
+
+    .player .name {
+      font-size: 4em;
+      color: var(--accent-color);
+      text-transform: uppercase;
+      line-height: 1;
+      transition: color 0.5s ease;
+    }
+
+    .player .agent {
+      font-size: 1.6em;
+      margin-top: 10px;
+    }
+
     .stats-container {
-        display: grid; grid-template-columns: 1fr 1fr;
-        gap: 25px; align-items: start; margin-top: 25px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
+      align-items: start;
+      margin-top: 25px;
     }
-    .chart-container { max-width: 300px; }
+
+    .chart-container {
+      max-width: 300px;
+    }
+
     .abilities h3 {
-        font-size: 1.3em; color: var(--accent-color);
-        border-bottom: 2px solid var(--accent-color);
-        margin-bottom: 18px; padding-bottom: 8px;
-        transition: color 0.5s ease, border-color 0.5s ease;
+      font-size: 1.3em;
+      color: var(--accent-color);
+      border-bottom: 2px solid var(--accent-color);
+      margin-bottom: 18px;
+      padding-bottom: 8px;
+      transition: color 0.5s ease, border-color 0.5s ease;
     }
-    .abilities span { display: block; font-family: monospace; font-size: 1.15em; margin-bottom: 6px; }
-    
+
+    .abilities span {
+      display: block;
+      font-family: monospace;
+      font-size: 1.15em;
+      margin-bottom: 6px;
+    }
+
     .lineup {
-      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-      display: flex; gap: 18px; z-index: 20;
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 18px;
+      z-index: 20;
     }
+
     .lineup-avatar {
-      width: 70px; height: 70px; border-radius: 50%;
-      border: 3px solid var(--light-color); cursor: pointer;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      border: 3px solid var(--light-color);
+      cursor: pointer;
       transition: all 0.3s ease;
-      background-size: cover; background-position: center;
+      background-size: cover;
+      background-position: center;
       box-shadow: 0 4px 15px rgba(0,0,0,0.5);
     }
+
     .lineup-avatar:hover {
       transform: scale(1.15) translateY(-5px);
-      border-color: var(--accent-color); box-shadow: 0 8px 25px var(--accent-color);
+      border-color: var(--accent-color);
+      box-shadow: 0 8px 25px var(--accent-color);
     }
+
     .lineup-avatar.selected {
       transform: scale(1.2) translateY(-5px);
-      border-color: var(--accent-color); box-shadow: 0 0 25px var(--accent-color);
+      border-color: var(--accent-color);
+      box-shadow: 0 0 25px var(--accent-color);
     }
   </style>
- </head>
- <body>
+</head>
+<body>
 
   <div class="background-container"></div>
 
@@ -177,9 +249,10 @@
     <div class="player-details-container"></div>
     <div class="lineup"></div>
   </div>
-  
-  <audio id="background-music" loop src="Summit.mp3"></audio> 
-  
+
+  <audio id="background-music" loop src="Summit.wav"></audio>
+  <audio id="click-sound"></audio>
+
   <script>
     const playerData = {
       marcinho: { name: 'Marcinho', agent: 'Sage', class: 'Sentinela', gif: 'https://64.media.tumblr.com/87434378350d5a44e9bbce6b094155e4/05082fe5ebb4ab2a-c0/s540x810/5305f9996c3e96b2760778ce198e88e1c05bb26d.gif', stats: { 'DANO': 125.8, 'K/D': 0.97, 'HS%': 12.1, 'WIN%': 48.0 }, abilities: { q: 'Orbe de Lentidão', e: 'Orbe Curativo', x: 'Ressurreição'}, theme: { color: '#44a383', bg: 'https://images.alphacoders.com/109/1095988.jpg' } },
@@ -190,143 +263,192 @@
       yuzuk:    { name: 'Yuzuk', agent: 'Skye', class: 'Iniciadora', gif: 'https://media1.tenor.com/m/4b3iXnTJRBkAAAAd/valorant-skye.gif', stats: { 'DANO': 117.4, 'K/D': 0.79, 'HS%': 26.0, 'WIN%': 61.5 }, abilities: { q: 'Predador Exp.', e: 'Luz Desbravadora', x: 'Rastreadores'}, theme: { color: '#68c56e', bg: 'https://images.alphacoders.com/112/1120021.jpg' } },
       dark:     { name: 'Dark', agent: 'Omen', class: 'Controlador', gif: 'https://media1.tenor.com/m/gXZNSfLz1oIAAAAd/casting-paranoia-omen.gif', stats: { 'DANO': 162.5, 'K/D': 1.29, 'HS%': 18.7, 'WIN%': 42.9 }, abilities: { q: 'Paranoia', e: 'Manto Sombrio', x: 'Salto das Sombras'}, theme: { color: '#884da4', bg: 'https://images.alphacoders.com/108/1084224.png' } }
     };
-    
+
     document.addEventListener('DOMContentLoaded', () => {
-        const lineupContainer = document.querySelector('.lineup');
-        const playerContainer = document.querySelector('.player-details-container');
-        const chartInstances = {};
-        let activePlayerKey = null;
+      const lineupContainer = document.querySelector('.lineup');
+      for (const key in playerData) {
+        const avatar = document.createElement('div');
+        avatar.classList.add('lineup-avatar');
+        avatar.dataset.player = key;
+        avatar.style.backgroundImage = `url(${playerData[key].gif})`;
+        avatar.addEventListener('click', () => showPlayer(key));
+        lineupContainer.appendChild(avatar);
+      }
 
-        for (const playerKey in playerData) {
-            const data = playerData[playerKey];
-            const playerCard = document.createElement('div');
-            playerCard.className = 'player';
-            playerCard.id = `player-card-${playerKey}`;
-            playerCard.innerHTML = `
-                <div class="visual"><img src="${data.gif}" alt="${data.name}"></div>
+      let currentChart = null;
+      let data = null; // Definir data fora da função showPlayer
+
+      function showPlayer(playerKey) {
+        data = playerData[playerKey]; // Atualizar data
+        if (!data) return;
+
+        const container = document.querySelector('.player-details-container');
+        const lineupAvatars = document.querySelectorAll('.lineup-avatar');
+        
+        // Som ao clicar
+        const clickSound = document.getElementById('click-sound');
+        // Use o nome da chave (ex: 'mistyc') para o nome do arquivo de som
+        clickSound.src = `${playerKey}.wav`;
+        clickSound.play().catch(e => console.log("A reprodução de áudio falhou: ", e));
+
+
+        // Atualiza a cor de destaque e o fundo
+        document.documentElement.style.setProperty('--accent-color', data.theme.color);
+        document.querySelector('.background-container').style.backgroundImage = `url(${data.theme.bg})`;
+
+        // Remove a classe 'active' do jogador atual
+        const currentPlayer = document.querySelector('.player.active');
+        if (currentPlayer) {
+            currentPlayer.classList.remove('active');
+        }
+
+        // Cria e insere o novo jogador após um pequeno atraso para a transição
+        setTimeout(() => {
+            container.innerHTML = `
+              <div class="player">
+                <div class="visual">
+                  <img src="${data.gif}" alt="${data.name}">
+                </div>
                 <div class="details">
-                    <p class="name">${data.name}</p>
-                    <p class="agent">${data.agent} / ${data.class}</p>
-                    <div class="stats-container">
-                        <div class="abilities">
-                            <h3>Habilidades</h3>
-                            ${Object.values(data.abilities).map(ability => `<span>- ${ability}</span>`).join('')}
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="chart-${playerKey}"></canvas>
-                        </div>
+                  <div class="name">${data.name}</div>
+                  <div class="agent">${data.agent} // ${data.class}</div>
+                  <div class="stats-container">
+                    <div class="chart-container">
+                      <canvas id="statsChart"></canvas>
                     </div>
-                </div>`;
-            playerContainer.appendChild(playerCard);
-
-            const avatar = document.createElement('div');
-            avatar.className = 'lineup-avatar';
-            avatar.dataset.player = playerKey;
-            avatar.style.backgroundImage = `url(${data.gif})`;
-            avatar.addEventListener('click', () => showPlayer(playerKey));
-            lineupContainer.appendChild(avatar);
-        }
-
-        function showPlayer(playerKey) {
-            if (activePlayerKey === playerKey) return;
+                    <div class="abilities">
+                      <h3>Habilidades Principais</h3>
+                      <span>Q - ${data.abilities.q}</span>
+                      <span>E - ${data.abilities.e}</span>
+                      <span>X - ${data.abilities.x}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
             
-            const oldPlayerCard = document.querySelector('.player.active');
-            if(oldPlayerCard) {
-                oldPlayerCard.classList.remove('active');
-            }
-            
-            activePlayerKey = playerKey;
-            
-            const data = playerData[playerKey];
-            document.documentElement.style.setProperty('--accent-color', data.theme.color);
-            document.querySelector('.background-container').style.backgroundImage = `url(${data.theme.bg})`;
-
-            document.querySelectorAll('.lineup-avatar').forEach(a => a.classList.remove('selected'));
-            
-            const playerCard = document.getElementById(`player-card-${playerKey}`);
-            const avatar = document.querySelector(`.lineup-avatar[data-player="${playerKey}"]`);
-            playerCard.classList.add('active');
-            avatar.classList.add('selected');
-
-            if (chartInstances[playerKey]) chartInstances[playerKey].destroy();
-            createRadarChart(playerKey);
-        }
-
-        function createRadarChart(playerKey) {
-            const data = playerData[playerKey];
-            const ctx = document.getElementById(`chart-${playerKey}`).getContext('2d');
-            const maxValues = { 'DANO': 180, 'K/D': 1.5, 'HS%': 30, 'WIN%': 100 };
-            const labels = Object.keys(data.stats);
-            const normalizedData = labels.map(label => (data.stats[label] / maxValues[label]) * 100);
-            
-            const themeColor = playerData[playerKey].theme.color;
-
-            chartInstances[playerKey] = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: data.name,
-                        data: normalizedData,
-                        backgroundColor: `${themeColor}66`, // Cor com 40% de opacidade
-                        borderColor: themeColor,
-                        borderWidth: 2,
-                        pointBackgroundColor: themeColor,
-                        pointRadius: 4,
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    animation: { duration: 1000, easing: 'easeOutQuint' },
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        r: {
-                            angleLines: { color: 'rgba(236, 232, 225, 0.2)' },
-                            grid: { color: 'rgba(236, 232, 225, 0.2)' },
-                            pointLabels: { color: '#ece8e1', font: { family: "'ValorantFont', Arial, sans-serif", size: 14 }},
-                            ticks: { display: false, max: 100, min: 0, stepSize: 25 }
-                        }
-                    }
-                }
-            });
-        }
-
-        const loadingText = document.getElementById('loading-text');
-        const startButton = document.getElementById('start-button');
-        const bootSequence = [
-            { text: "INICIANDO SISTEMA HOLOGRÁFICO...", duration: 1500 },
-            { text: "CALIBRANDO PROJETORES...", duration: 1000 },
-            { text: "CARREGANDO PERFIS DOS OPERADORES...", duration: 1500 },
-            { text: "PRONTO PARA INTERFACE.", duration: 500 }
-        ];
-        let currentStep = 0;
-
-        function runBootSequence() {
-            if (currentStep < bootSequence.length) {
-                loadingText.textContent = bootSequence[currentStep].text;
-                setTimeout(runBootSequence, bootSequence[currentStep].duration);
-                currentStep++;
-            } else {
-                startButton.style.display = 'block';
-            }
-        }
-        runBootSequence();
-
-        startButton.addEventListener('click', () => {
-            const music = document.getElementById('background-music');
-            music.volume = 0.3;
-            music.play().catch(e => console.log("Autoplay bloqueado pelo navegador."));
-
-            const loadingScreen = document.getElementById('loading-screen');
-            loadingScreen.style.transition = 'opacity 0.5s';
-            loadingScreen.style.opacity = '0';
+            // Adiciona a classe 'active' para o efeito de fade-in
             setTimeout(() => {
-                loadingScreen.style.display = 'none';
-                document.querySelector('.main-container').style.display = 'flex';
-                showPlayer(Object.keys(playerData)[0]);
-            }, 500);
-        }, { once: true });
+                const newPlayer = document.querySelector('.player');
+                if (newPlayer) newPlayer.classList.add('active');
+            }, 50);
+
+            createStatsChart(data.stats, data.theme.color);
+        }, 250);
+
+
+        lineupAvatars.forEach(avatar => {
+          avatar.classList.remove('selected');
+          if (avatar.dataset.player === playerKey) {
+            avatar.classList.add('selected');
+          }
+        });
+      }
+
+      function createStatsChart(stats, themeColor) {
+        const ctx = document.getElementById('statsChart');
+        if (!ctx) return;
+        
+        if (currentChart) {
+          currentChart.destroy();
+        }
+
+        const labels = Object.keys(stats);
+        const dataValues = Object.values(stats);
+        
+        // Normaliza os dados para uma escala de 0-100 para o gráfico de radar
+        const maxValues = { 'DANO': 200, 'K/D': 2.0, 'HS%': 30, 'WIN%': 100 };
+        const normalizedData = dataValues.map((value, index) => {
+            const label = labels[index];
+            return (value / maxValues[label]) * 100;
+        });
+
+        currentChart = new Chart(ctx, {
+          type: 'radar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: data.name,
+              data: normalizedData,
+              backgroundColor: `${themeColor}66`, // Cor com 40% de opacidade
+              borderColor: themeColor,
+              borderWidth: 2,
+              pointBackgroundColor: themeColor,
+              pointRadius: 4,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+                duration: 1000,
+                easing: 'easeOutQuint'
+            },
+            plugins: {
+              legend: {
+                display: false
+              }
+            },
+            scales: {
+              r: {
+                angleLines: { color: 'rgba(236, 232, 225, 0.2)' },
+                grid: { color: 'rgba(236, 232, 225, 0.2)' },
+                pointLabels: { 
+                    color: '#ece8e1',
+                    font: {
+                        family: "'ValorantFont', Arial, sans-serif",
+                        size: 14
+                    }
+                },
+                ticks: {
+                  display: false,
+                  max: 100,
+                  min: 0,
+                  stepSize: 25
+                }
+              }
+            }
+          }
+        });
+      }
+
+      const loadingText = document.getElementById('loading-text');
+      const startButton = document.getElementById('start-button');
+      const bootSequence = [
+          { text: "INICIANDO SISTEMA HOLOGRÁFICO...", duration: 1500 },
+          { text: "CALIBRANDO PROJETORES...", duration: 1000 },
+          { text: "CARREGANDO PERFIS DOS OPERADORES...", duration: 1500 },
+          { text: "PRONTO PARA INTERFACE.", duration: 500 }
+      ];
+      let currentStep = 0;
+
+      function runBootSequence() {
+          if (currentStep < bootSequence.length) {
+              loadingText.textContent = bootSequence[currentStep].text;
+              setTimeout(runBootSequence, bootSequence[currentStep].duration);
+              currentStep++;
+          } else {
+              startButton.style.display = 'block';
+          }
+      }
+      runBootSequence();
+
+      startButton.addEventListener('click', () => {
+        const music = document.getElementById('background-music');
+        music.volume = 0.3;
+        music.play().catch(e => console.log("Autoplay bloqueado pelo navegador."));
+        
+        const loadingScreen = document.getElementById('loading-screen');
+        loadingScreen.style.transition = 'opacity 0.5s';
+        loadingScreen.style.opacity = '0';
+        
+        setTimeout(() => {
+          loadingScreen.style.display = 'none';
+          document.querySelector('.main-container').style.display = 'flex';
+          showPlayer(Object.keys(playerData)[0]);
+        }, 500);
+      }, { once: true });
     });
   </script>
- </body>
- </html>
+</body>
+</html>
