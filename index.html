@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dragons - A.R.C. INTERFACE [ULTIMATE]</title>
+  <title>Dragons - A.R.C. INTERFACE [VERSÃO DEFINITIVA]</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
   <style>
@@ -15,7 +15,6 @@
       --valorant-red: #ff4655;
       --valorant-dark: #0a1018;
       --valorant-light: #ece8e1;
-      --valorant-secondary: #7f8c9b;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -25,30 +24,23 @@
       overflow: hidden;
       min-height: 100vh;
     }
-    .scanlines {
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.02) 50%, rgba(255,255,255,0) 100%);
-        background-size: 100% 4px;
-        z-index: 10;
-        pointer-events: none;
-        animation: scan 0.2s linear infinite;
+    .background-layers {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
     }
-    @keyframes scan {
-        from { background-position: 0 0; }
-        to { background-position: 0 4px; }
+    #particles-js {
+      position: absolute; width: 100%; height: 100%;
     }
-    #particles-js { position: fixed; width: 100%; height: 100%; z-index: -2; }
     #video-bg {
-      position: fixed; top: 50%; left: 50%; min-width: 100%; min-height: 100%;
-      width: auto; height: auto; z-index: -3; transform: translateX(-50%) translateY(-50%);
+      position: absolute; top: 50%; left: 50%; min-width: 100%; min-height: 100%;
+      width: auto; height: auto; z-index: -2; transform: translateX(-50%) translateY(-50%);
       opacity: 0.1; filter: blur(3px);
     }
+    
     .main-container {
         display: none;
         flex-direction: column; align-items: center; justify-content: center;
         min-height: 100vh; padding: 20px;
-        animation: fadeInContainer 1s forwards 4.5s;
+        animation: fadeInContainer 1s forwards;
     }
     @keyframes fadeInContainer { to { opacity: 1; } }
 
@@ -56,14 +48,38 @@
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: var(--valorant-dark); z-index: 100;
       display: flex; align-items: center; justify-content: center;
-      font-family: monospace; font-size: 1.5em;
+      flex-direction: column;
+      font-family: monospace; font-size: 1.2em;
+      text-align: center;
     }
-    .loading-text span { opacity: 0; animation: fadeIn 0.1s forwards; }
-    @keyframes fadeIn { to { opacity: 1; } }
+    #loading-text {
+        text-shadow: 0 0 5px var(--valorant-red);
+        height: 80px; /* Espaço para as linhas de texto */
+    }
+    #loading-progress-bar-container {
+        width: 300px; height: 10px; border: 1px solid var(--valorant-red); margin-top: 20px;
+        box-shadow: 0 0 10px rgba(255, 70, 85, 0.5);
+    }
+    #loading-progress-bar {
+        width: 0%; height: 100%; background: var(--valorant-red);
+        transition: width 0.1s linear;
+        box-shadow: 0 0 15px var(--valorant-red);
+    }
+    #start-button {
+        display: none; font-family: 'ValorantFont', Arial, sans-serif;
+        font-size: 1.2em; color: var(--valorant-red); background: transparent;
+        border: 2px solid var(--valorant-red); padding: 10px 20px;
+        margin-top: 30px; cursor: pointer; text-transform: uppercase;
+        animation: pulse 1.5s infinite;
+        text-shadow: 0 0 10px var(--valorant-red);
+    }
+    @keyframes pulse {
+        50% { transform: scale(1.05); box-shadow: 0 0 25px var(--valorant-red); }
+    }
 
     header h1 {
-      font-size: 3.5em; text-transform: uppercase; color: var(--valorant-light);
-      text-shadow: 0 0 15px var(--valorant-red); margin-bottom: 50px; text-align: center;
+      font-size: 3.5em; text-transform: uppercase;
+      text-shadow: 0 0 15px var(--valorant-red); margin-bottom: 50px;
     }
 
     .player-details-container {
@@ -77,57 +93,45 @@
         display: grid; grid-template-columns: 45% 55%;
         align-items: center; gap: 30px;
         opacity: 0; visibility: hidden;
-        transition: opacity 0.4s ease, visibility 0s linear 0.4s;
+        transition: opacity 0.5s ease, visibility 0s linear 0.5s;
     }
     .player.active {
-        opacity: 1; visibility: visible; transition-delay: 0.4s;
-    }
-    .player.glitching-out { animation: glitchOut 0.4s forwards; }
-    @keyframes glitchOut {
-        0% { opacity: 1; transform: none; }
-        50% { opacity: 0.3; transform: translateX(10px) skewX(-5deg); }
-        100% { opacity: 0; transform: translateX(-20px) skewX(10deg); visibility: hidden; }
+        opacity: 1; visibility: visible;
+        transition: opacity 0.5s ease, visibility 0s linear 0s;
     }
     
     .player .visual {
         position: relative; width: 100%; height: 100%;
         border-radius: 5px; overflow: hidden;
+        transform: translateX(-30px); opacity: 0;
+        transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1) 0.2s, opacity 0.8s ease 0.2s;
     }
+    .player.active .visual { transform: translateX(0); opacity: 1; }
     .player .visual img {
       width: 100%; height: 100%; object-fit: cover;
       clip-path: polygon(0 0, 85% 0, 100% 100%, 0% 100%);
     }
 
-    /* HUD OVERLAY */
-    .hud-overlay {
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        pointer-events: none;
-    }
-    .hud-reticle {
-        position: absolute; top: 50%; left: 40%;
-        width: 80px; height: 80px;
-        border: 1px solid var(--valorant-red);
-        transform: translate(-50%, -50%) rotate(45deg);
-        animation: reticlePulse 3s infinite ease-in-out;
-    }
-    .hud-reticle::before, .hud-reticle::after {
-        content: ''; position: absolute; background: var(--valorant-red);
-    }
-    .hud-reticle::before { width: 100%; height: 1px; top: 50%; left: 0; }
-    .hud-reticle::after { height: 100%; width: 1px; left: 50%; top: 0; }
-    @keyframes reticlePulse { 50% { transform: translate(-50%, -50%) rotate(45deg) scale(1.1); } }
-
     .player .details {
         display: flex; flex-direction: column; justify-content: center;
-        height: 100%; padding: 30px;
-        border-radius: 5px;
-        background: rgba(15, 25, 35, 0.6);
-        backdrop-filter: blur(10px);
+        height: 100%; padding: 30px; border-radius: 5px;
+        background: rgba(15, 25, 35, 0.7); backdrop-filter: blur(8px);
         border: 1px solid rgba(255, 255, 255, 0.1);
+        transform: translateX(30px); opacity: 0;
+        transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1) 0.4s, opacity 0.8s ease 0.4s;
     }
+    .player.active .details { transform: translateX(0); opacity: 1; }
     
+    .player .name, .player .agent, .stats-container {
+        transform: translateY(20px); opacity: 0;
+        transition: transform 0.6s ease, opacity 0.6s ease;
+    }
+    .player.active .name { transform: translateY(0); opacity: 1; transition-delay: 0.6s; }
+    .player.active .agent { transform: translateY(0); opacity: 1; transition-delay: 0.7s; }
+    .player.active .stats-container { transform: translateY(0); opacity: 1; transition-delay: 0.8s; }
+
     .player .name { font-size: 4em; color: var(--valorant-red); text-transform: uppercase; line-height: 1; }
-    .player .agent { font-size: 1.6em; margin-top: 10px; color: var(--valorant-secondary); }
+    .player .agent { font-size: 1.6em; margin-top: 10px; }
     
     .stats-container {
         display: grid; grid-template-columns: 1fr 1fr;
@@ -164,14 +168,17 @@
  </head>
  <body>
 
-  <div class="scanlines"></div>
-  <div id="particles-js"></div>
-  <div id="video-bg">
-    <video playsinline autoplay muted loop poster="dragons.jpg"></video>
+  <div class="background-layers">
+    <div id="particles-js"></div>
+    <div id="video-bg">
+        <video playsinline autoplay muted loop poster="dragons.jpg"></video>
+    </div>
   </div>
 
   <div id="loading-screen">
-    <div class="loading-text"></div>
+    <div id="loading-text"></div>
+    <div id="loading-progress-bar-container"><div id="loading-progress-bar"></div></div>
+    <button id="start-button">Iniciar Briefing</button>
   </div>
 
   <div class="main-container">
@@ -199,17 +206,13 @@
         const chartInstances = {};
         let activePlayerKey = null;
 
-        // --- 1. GERAÇÃO INICIAL ---
         for (const playerKey in playerData) {
             const data = playerData[playerKey];
             const playerCard = document.createElement('div');
             playerCard.className = 'player';
             playerCard.id = `player-card-${playerKey}`;
             playerCard.innerHTML = `
-                <div class="visual">
-                    <img src="${data.gif}" alt="${data.name}">
-                    <div class="hud-overlay"><div class="hud-reticle"></div></div>
-                </div>
+                <div class="visual"><img src="${data.gif}" alt="${data.name}"></div>
                 <div class="details">
                     <p class="name">${data.name}</p>
                     <p class="agent">${data.agent} / ${data.class}</p>
@@ -229,31 +232,15 @@
             avatar.className = 'lineup-avatar';
             avatar.dataset.player = playerKey;
             avatar.style.backgroundImage = `url(${data.gif})`;
-            avatar.addEventListener('click', () => switchPlayer(playerKey));
+            avatar.addEventListener('click', () => showPlayer(playerKey));
             lineupContainer.appendChild(avatar);
         }
 
-        // --- 2. FUNÇÃO PARA TROCAR DE JOGADOR COM ANIMAÇÃO ---
-        function switchPlayer(newPlayerKey) {
-            if (newPlayerKey === activePlayerKey) return;
-
-            const oldPlayerCard = document.getElementById(`player-card-${activePlayerKey}`);
-            if (oldPlayerCard) {
-                oldPlayerCard.classList.add('glitching-out');
-                oldPlayerCard.addEventListener('animationend', () => {
-                    oldPlayerCard.classList.remove('active', 'glitching-out');
-                }, { once: true });
-            }
-
-            activePlayerKey = newPlayerKey;
-
-            setTimeout(() => {
-                showPlayer(newPlayerKey);
-            }, 200);
-        }
-
-        // --- 3. FUNÇÃO PARA MOSTRAR JOGADOR E CRIAR GRÁFICO ---
         function showPlayer(playerKey) {
+            if (activePlayerKey === playerKey) return;
+            activePlayerKey = playerKey;
+            
+            document.querySelectorAll('.player').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.lineup-avatar').forEach(a => a.classList.remove('selected'));
             
             const playerCard = document.getElementById(`player-card-${playerKey}`);
@@ -267,7 +254,6 @@
             createRadarChart(playerKey);
         }
 
-        // --- 4. FUNÇÃO DE GRÁFICO ---
         function createRadarChart(playerKey) {
             const data = playerData[playerKey];
             const ctx = document.getElementById(`chart-${playerKey}`).getContext('2d');
@@ -305,51 +291,48 @@
             });
         }
 
-        // --- 5. TELA DE LOADING E INICIALIZAÇÃO ---
-        const loadingText = document.querySelector('.loading-text');
-        const lines = ["Acessando Banco de Dados DRAGONS...", "Analisando Operadores...", "Briefing Tático Carregado."];
-        let lineIndex = 0; let charIndex = 0;
-        function typeLine() {
-          if (lineIndex < lines.length) {
-              if (charIndex < lines[lineIndex].length) {
-                  loadingText.innerHTML += `<span>${lines[lineIndex].charAt(charIndex)}</span>`;
-                  charIndex++; setTimeout(typeLine, 30);
-              } else {
-                  loadingText.innerHTML += '<br>';
-                  lineIndex++; charIndex = 0; setTimeout(typeLine, 500);
-              }
-          } else {
+        const loadingText = document.getElementById('loading-text');
+        const startButton = document.getElementById('start-button');
+        const progressBar = document.getElementById('loading-progress-bar');
+        const bootSequence = [
+            { text: "INICIANDO A.R.C. KERNEL...", duration: 1000 },
+            { text: "VERIFICANDO MÓDULOS...", duration: 800 },
+            { text: "CARREGANDO DADOS DOS OPERADORES...", duration: 1500 },
+            { text: "SISTEMA PRONTO. AGUARDANDO AUTORIZAÇÃO...", duration: 500 }
+        ];
+        let currentStep = 0;
+
+        function runBootSequence() {
+            if (currentStep < bootSequence.length) {
+                loadingText.textContent = bootSequence[currentStep].text;
+                progressBar.style.width = ((currentStep + 1) / bootSequence.length) * 100 + '%';
+                setTimeout(runBootSequence, bootSequence[currentStep].duration);
+                currentStep++;
+            } else {
+                startButton.style.display = 'block';
+                startButton.style.animation = 'pulse 1.5s infinite, fadeIn 0.5s forwards';
+            }
+        }
+        runBootSequence();
+
+        startButton.addEventListener('click', () => {
+            const music = document.getElementById('background-music');
+            music.volume = 0.3;
+            music.play();
+
+            const loadingScreen = document.getElementById('loading-screen');
+            loadingScreen.style.transition = 'opacity 0.5s';
+            loadingScreen.style.opacity = '0';
             setTimeout(() => {
-                const loadingScreen = document.getElementById('loading-screen');
-                loadingScreen.style.transition = 'opacity 1s';
-                loadingScreen.style.opacity = '0';
-                setTimeout(() => {
-                    loadingScreen.style.display = 'none';
-                    document.querySelector('.main-container').style.display = 'flex';
-                    activePlayerKey = Object.keys(playerData)[0];
-                    showPlayer(activePlayerKey);
-
-                    // LÓGICA DA MÚSICA
-                    const music = document.getElementById('background-music');
-                    music.volume = 0.3; // Definir um volume agradável
-                    
-                    // Tenta tocar a música. Se falhar, espera por um clique do utilizador.
-                    let promise = music.play();
-                    if (promise !== undefined) {
-                        promise.catch(error => {
-                            console.log("Autoplay bloqueado, à espera de interação do utilizador.");
-                            document.body.addEventListener('click', () => music.play(), { once: true });
-                        });
-                    }
-                }, 1000);
+                loadingScreen.style.display = 'none';
+                document.querySelector('.main-container').style.display = 'flex';
+                showPlayer(Object.keys(playerData)[0]);
             }, 500);
-          }
-      }
-      typeLine();
+        }, { once: true });
 
-      particlesJS('particles-js',
-        {"particles":{"number":{"value":80,"density":{"enable":true,"value_area":800}},"color":{"value":"#ff4655"},"shape":{"type":"circle"},"opacity":{"value":0.5,"random":true},"size":{"value":3,"random":true},"line_linked":{"enable":false},"move":{"enable":true,"speed":2,"direction":"none","random":true,"straight":false,"out_mode":"out","bounce":false}},"interactivity":{"detect_on":"canvas","events":{"onhover":{"enable":true,"mode":"repulse"},"onclick":{"enable":true,"mode":"push"}},"modes":{"repulse":{"distance":60},"push":{"particles_nb":4}}},"retina_detect":true}
-      );
+        particlesJS('particles-js',
+            {"particles":{"number":{"value":60,"density":{"enable":true,"value_area":800}},"color":{"value":"#ffffff"},"shape":{"type":"circle"},"opacity":{"value":0.3,"random":true},"size":{"value":3,"random":true},"line_linked":{"enable":true,"distance":150,"color":"#ffffff","opacity":0.2,"width":1},"move":{"enable":true,"speed":1,"direction":"none","random":true,"straight":false,"out_mode":"out","bounce":false}},"interactivity":{},"retina_detect":true}
+        );
     });
   </script>
  </body>
