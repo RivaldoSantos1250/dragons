@@ -3,39 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dragons - A.R.C. INTERFACE [VERSÃO DEFINITIVA]</title>
+  <title>Dragons - Interface Holográfica</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
   <style>
     @font-face {
       font-family: 'ValorantFont';
       src: url('Valorant Font.ttf') format('truetype');
     }
     :root {
-      --valorant-red: #ff4655;
-      --valorant-dark: #0a1018;
-      --valorant-light: #ece8e1;
+      --accent-color: #ff4655; /* Cor dinâmica */
+      --dark-color: #0a1018;
+      --light-color: #ece8e1;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'ValorantFont', Arial, sans-serif;
-      background-color: var(--valorant-dark);
-      color: var(--valorant-light);
+      background-color: var(--dark-color);
+      color: var(--light-color);
       overflow: hidden;
       min-height: 100vh;
     }
-    .background-layers {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+    .background-container {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+        transition: background-image 1s ease-in-out;
+        background-size: cover;
+        background-position: center;
     }
-    #particles-js {
-      position: absolute; width: 100%; height: 100%;
+    .background-container::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: radial-gradient(circle, transparent 50%, var(--dark-color) 100%);
+        opacity: 0.8;
     }
-    #video-bg {
-      position: absolute; top: 50%; left: 50%; min-width: 100%; min-height: 100%;
-      width: auto; height: auto; z-index: -2; transform: translateX(-50%) translateY(-50%);
-      opacity: 0.1; filter: blur(3px);
-    }
-    
+
     .main-container {
         display: none;
         flex-direction: column; align-items: center; justify-content: center;
@@ -46,45 +47,52 @@
 
     #loading-screen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: var(--valorant-dark); z-index: 100;
+      background: var(--dark-color); z-index: 100;
       display: flex; align-items: center; justify-content: center;
       flex-direction: column;
-      font-family: monospace; font-size: 1.2em;
-      text-align: center;
+      font-family: monospace;
     }
+    .loader-ring {
+        width: 150px; height: 150px;
+        border: 2px solid var(--accent-color);
+        border-radius: 50%;
+        position: relative;
+        animation: rotate 20s linear infinite;
+    }
+    .loader-ring::before {
+        content: ''; position: absolute;
+        width: 110%; height: 110%; top: -5%; left: -5%;
+        border: 2px solid var(--accent-color);
+        border-radius: 50%;
+        opacity: 0.5;
+    }
+    @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     #loading-text {
-        text-shadow: 0 0 5px var(--valorant-red);
-        height: 80px; /* Espaço para as linhas de texto */
-    }
-    #loading-progress-bar-container {
-        width: 300px; height: 10px; border: 1px solid var(--valorant-red); margin-top: 20px;
-        box-shadow: 0 0 10px rgba(255, 70, 85, 0.5);
-    }
-    #loading-progress-bar {
-        width: 0%; height: 100%; background: var(--valorant-red);
-        transition: width 0.1s linear;
-        box-shadow: 0 0 15px var(--valorant-red);
+        margin-top: 20px; font-size: 1.2em;
+        text-shadow: 0 0 5px var(--accent-color);
     }
     #start-button {
         display: none; font-family: 'ValorantFont', Arial, sans-serif;
-        font-size: 1.2em; color: var(--valorant-red); background: transparent;
-        border: 2px solid var(--valorant-red); padding: 10px 20px;
+        font-size: 1.2em; color: var(--accent-color); background: transparent;
+        border: 2px solid var(--accent-color); padding: 10px 20px;
         margin-top: 30px; cursor: pointer; text-transform: uppercase;
         animation: pulse 1.5s infinite;
-        text-shadow: 0 0 10px var(--valorant-red);
+        text-shadow: 0 0 10px var(--accent-color);
     }
     @keyframes pulse {
-        50% { transform: scale(1.05); box-shadow: 0 0 25px var(--valorant-red); }
+        50% { transform: scale(1.05); box-shadow: 0 0 25px var(--accent-color); }
     }
 
     header h1 {
       font-size: 3.5em; text-transform: uppercase;
-      text-shadow: 0 0 15px var(--valorant-red); margin-bottom: 50px;
+      text-shadow: 0 0 15px var(--accent-color); margin-bottom: 50px;
+      transition: text-shadow 0.5s ease;
     }
 
     .player-details-container {
         width: 100%; max-width: 1200px; height: 60vh;
         max-height: 520px; position: relative;
+        perspective: 1500px;
     }
 
     .player {
@@ -92,21 +100,19 @@
         width: 100%; height: 100%;
         display: grid; grid-template-columns: 45% 55%;
         align-items: center; gap: 30px;
-        opacity: 0; visibility: hidden;
-        transition: opacity 0.5s ease, visibility 0s linear 0.5s;
+        opacity: 0;
+        transform: rotateY(-30deg) scale(0.9);
+        transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.8s ease;
     }
     .player.active {
-        opacity: 1; visibility: visible;
-        transition: opacity 0.5s ease, visibility 0s linear 0s;
+        opacity: 1;
+        transform: rotateY(0) scale(1);
     }
     
     .player .visual {
-        position: relative; width: 100%; height: 100%;
+        width: 100%; height: 100%;
         border-radius: 5px; overflow: hidden;
-        transform: translateX(-30px); opacity: 0;
-        transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1) 0.2s, opacity 0.8s ease 0.2s;
     }
-    .player.active .visual { transform: translateX(0); opacity: 1; }
     .player .visual img {
       width: 100%; height: 100%; object-fit: cover;
       clip-path: polygon(0 0, 85% 0, 100% 100%, 0% 100%);
@@ -115,22 +121,11 @@
     .player .details {
         display: flex; flex-direction: column; justify-content: center;
         height: 100%; padding: 30px; border-radius: 5px;
-        background: rgba(15, 25, 35, 0.7); backdrop-filter: blur(8px);
+        background: rgba(15, 25, 35, 0.6); backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.1);
-        transform: translateX(30px); opacity: 0;
-        transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1) 0.4s, opacity 0.8s ease 0.4s;
     }
-    .player.active .details { transform: translateX(0); opacity: 1; }
     
-    .player .name, .player .agent, .stats-container {
-        transform: translateY(20px); opacity: 0;
-        transition: transform 0.6s ease, opacity 0.6s ease;
-    }
-    .player.active .name { transform: translateY(0); opacity: 1; transition-delay: 0.6s; }
-    .player.active .agent { transform: translateY(0); opacity: 1; transition-delay: 0.7s; }
-    .player.active .stats-container { transform: translateY(0); opacity: 1; transition-delay: 0.8s; }
-
-    .player .name { font-size: 4em; color: var(--valorant-red); text-transform: uppercase; line-height: 1; }
+    .player .name { font-size: 4em; color: var(--accent-color); text-transform: uppercase; line-height: 1; transition: color 0.5s ease; }
     .player .agent { font-size: 1.6em; margin-top: 10px; }
     
     .stats-container {
@@ -139,9 +134,10 @@
     }
     .chart-container { max-width: 300px; }
     .abilities h3 {
-        font-size: 1.3em; color: var(--valorant-red);
-        border-bottom: 2px solid var(--valorant-red);
+        font-size: 1.3em; color: var(--accent-color);
+        border-bottom: 2px solid var(--accent-color);
         margin-bottom: 18px; padding-bottom: 8px;
+        transition: color 0.5s ease, border-color 0.5s ease;
     }
     .abilities span { display: block; font-family: monospace; font-size: 1.15em; margin-bottom: 6px; }
     
@@ -151,33 +147,28 @@
     }
     .lineup-avatar {
       width: 70px; height: 70px; border-radius: 50%;
-      border: 3px solid var(--valorant-light); cursor: pointer;
+      border: 3px solid var(--light-color); cursor: pointer;
       transition: all 0.3s ease;
       background-size: cover; background-position: center;
       box-shadow: 0 4px 15px rgba(0,0,0,0.5);
     }
     .lineup-avatar:hover {
       transform: scale(1.15) translateY(-5px);
-      border-color: var(--valorant-red); box-shadow: 0 8px 25px var(--valorant-red);
+      border-color: var(--accent-color); box-shadow: 0 8px 25px var(--accent-color);
     }
     .lineup-avatar.selected {
       transform: scale(1.2) translateY(-5px);
-      border-color: var(--valorant-red); box-shadow: 0 0 25px var(--valorant-red);
+      border-color: var(--accent-color); box-shadow: 0 0 25px var(--accent-color);
     }
   </style>
  </head>
  <body>
 
-  <div class="background-layers">
-    <div id="particles-js"></div>
-    <div id="video-bg">
-        <video playsinline autoplay muted loop poster="dragons.jpg"></video>
-    </div>
-  </div>
+  <div class="background-container"></div>
 
   <div id="loading-screen">
-    <div id="loading-text"></div>
-    <div id="loading-progress-bar-container"><div id="loading-progress-bar"></div></div>
+    <div class="loader-ring"></div>
+    <div id="loading-text">INICIANDO SISTEMA...</div>
     <button id="start-button">Iniciar Briefing</button>
   </div>
 
@@ -191,13 +182,13 @@
   
   <script>
     const playerData = {
-      marcinho: { name: 'Marcinho', agent: 'Sage', class: 'Sentinela', gif: 'https://64.media.tumblr.com/87434378350d5a44e9bbce6b094155e4/05082fe5ebb4ab2a-c0/s540x810/5305f9996c3e96b2760778ce198e88e1c05bb26d.gif', stats: { 'DANO': 125.8, 'K/D': 0.97, 'HS%': 12.1, 'WIN%': 48.0 }, abilities: { q: 'Orbe de Lentidão', e: 'Orbe Curativo', x: 'Ressurreição'} },
-      nicemk: { name: 'Nicemk', agent: 'Cypher', class: 'Sentinela', gif: 'https://media1.tenor.com/m/S52u7qmATOkAAAAC/cypher-cypher-valorant.gif', stats: { 'DANO': 163.6, 'K/D': 1.06, 'HS%': 16.6, 'WIN%': 47.1 }, abilities: { q: 'Jaula Cibernética', e: 'Câmera', x: 'Assalto Neural'} },
-      silence: { name: 'Silence', agent: 'Sova', class: 'Iniciador', gif: 'https://media1.tenor.com/m/rkPKFm0AtvsAAAAC/sova-valorant.gif', stats: { 'DANO': 122.9, 'K/D': 0.94, 'HS%': 16.2, 'WIN%': 55.1 }, abilities: { q: 'Flecha de Choque', e: 'Flecha Rastreadora', x: 'Fúria do Caçador'} },
-      mistyc: { name: 'Mistyc', agent: 'Raze', class: 'Duelista', gif: 'https://media1.tenor.com/m/iHeaZNItkCMAAAAC/what-happened-raze.gif', stats: { 'DANO': 163.6, 'K/D': 1.06, 'HS%': 16.6, 'WIN%': 47.1 }, abilities: { q: 'Carga de Explosivos', e: 'Cartuchos de Tinta', x: 'Estraga-prazeres'} },
-      midora: { name: 'Midora', agent: 'Jett', class: 'Duelista', gif: 'https://img3.pillowfort.social/posts/32ceda568b6203519e21.gif', stats: { 'DANO': 119.3, 'K/D': 0.80, 'HS%': 19.2, 'WIN%': 44.4 }, abilities: { q: 'Corrente Asc.', e: 'Brisa de Impulso', x: 'Tormenta de Aço'} },
-      yuzuk: { name: 'Yuzuk', agent: 'Skye', class: 'Iniciadora', gif: 'https://media1.tenor.com/m/4b3iXnTJRBkAAAAd/valorant-skye.gif', stats: { 'DANO': 117.4, 'K/D': 0.79, 'HS%': 26.0, 'WIN%': 61.5 }, abilities: { q: 'Predador Exp.', e: 'Luz Desbravadora', x: 'Rastreadores'} },
-      dark: { name: 'Dark', agent: 'Omen', class: 'Controlador', gif: 'https://media1.tenor.com/m/gXZNSfLz1oIAAAAd/casting-paranoia-omen.gif', stats: { 'DANO': 162.5, 'K/D': 1.29, 'HS%': 18.7, 'WIN%': 42.9 }, abilities: { q: 'Paranoia', e: 'Manto Sombrio', x: 'Salto das Sombras'} }
+      marcinho: { name: 'Marcinho', agent: 'Sage', class: 'Sentinela', gif: 'https://64.media.tumblr.com/87434378350d5a44e9bbce6b094155e4/05082fe5ebb4ab2a-c0/s540x810/5305f9996c3e96b2760778ce198e88e1c05bb26d.gif', stats: { 'DANO': 125.8, 'K/D': 0.97, 'HS%': 12.1, 'WIN%': 48.0 }, abilities: { q: 'Orbe de Lentidão', e: 'Orbe Curativo', x: 'Ressurreição'}, theme: { color: '#44a383', bg: 'https://images.alphacoders.com/109/1095988.jpg' } },
+      nicemk:   { name: 'Nicemk', agent: 'Cypher', class: 'Sentinela', gif: 'https://media1.tenor.com/m/S52u7qmATOkAAAAC/cypher-cypher-valorant.gif', stats: { 'DANO': 163.6, 'K/D': 1.06, 'HS%': 16.6, 'WIN%': 47.1 }, abilities: { q: 'Jaula Cibernética', e: 'Câmera', x: 'Assalto Neural'}, theme: { color: '#d8b244', bg: 'https://images.alphacoders.com/108/1084222.png' } },
+      silence:  { name: 'Silence', agent: 'Sova', class: 'Iniciador', gif: 'https://media1.tenor.com/m/rkPKFm0AtvsAAAAC/sova-valorant.gif', stats: { 'DANO': 122.9, 'K/D': 0.94, 'HS%': 16.2, 'WIN%': 55.1 }, abilities: { q: 'Flecha de Choque', e: 'Flecha Rastreadora', x: 'Fúria do Caçador'}, theme: { color: '#3f93d1', bg: 'https://images.alphacoders.com/108/1084227.png' } },
+      mistyc:   { name: 'Mistyc', agent: 'Raze', class: 'Duelista', gif: 'https://media1.tenor.com/m/iHeaZNItkCMAAAAC/what-happened-raze.gif', stats: { 'DANO': 163.6, 'K/D': 1.06, 'HS%': 16.6, 'WIN%': 47.1 }, abilities: { q: 'Carga de Explosivos', e: 'Cartuchos de Tinta', x: 'Estraga-prazeres'}, theme: { color: '#f5923c', bg: 'https://images.alphacoders.com/112/1120023.jpg' } },
+      midora:   { name: 'Midora', agent: 'Jett', class: 'Duelista', gif: 'https://img3.pillowfort.social/posts/32ceda568b6203519e21.gif', stats: { 'DANO': 119.3, 'K/D': 0.80, 'HS%': 19.2, 'WIN%': 44.4 }, abilities: { q: 'Corrente Asc.', e: 'Brisa de Impulso', x: 'Tormenta de Aço'}, theme: { color: '#6e98ff', bg: 'https://images.alphacoders.com/111/1119567.jpg' } },
+      yuzuk:    { name: 'Yuzuk', agent: 'Skye', class: 'Iniciadora', gif: 'https://media1.tenor.com/m/4b3iXnTJRBkAAAAd/valorant-skye.gif', stats: { 'DANO': 117.4, 'K/D': 0.79, 'HS%': 26.0, 'WIN%': 61.5 }, abilities: { q: 'Predador Exp.', e: 'Luz Desbravadora', x: 'Rastreadores'}, theme: { color: '#68c56e', bg: 'https://images.alphacoders.com/112/1120021.jpg' } },
+      dark:     { name: 'Dark', agent: 'Omen', class: 'Controlador', gif: 'https://media1.tenor.com/m/gXZNSfLz1oIAAAAd/casting-paranoia-omen.gif', stats: { 'DANO': 162.5, 'K/D': 1.29, 'HS%': 18.7, 'WIN%': 42.9 }, abilities: { q: 'Paranoia', e: 'Manto Sombrio', x: 'Salto das Sombras'}, theme: { color: '#884da4', bg: 'https://images.alphacoders.com/108/1084224.png' } }
     };
     
     document.addEventListener('DOMContentLoaded', () => {
@@ -238,9 +229,18 @@
 
         function showPlayer(playerKey) {
             if (activePlayerKey === playerKey) return;
+            
+            const oldPlayerCard = document.querySelector('.player.active');
+            if(oldPlayerCard) {
+                oldPlayerCard.classList.remove('active');
+            }
+            
             activePlayerKey = playerKey;
             
-            document.querySelectorAll('.player').forEach(p => p.classList.remove('active'));
+            const data = playerData[playerKey];
+            document.documentElement.style.setProperty('--accent-color', data.theme.color);
+            document.querySelector('.background-container').style.backgroundImage = `url(${data.theme.bg})`;
+
             document.querySelectorAll('.lineup-avatar').forEach(a => a.classList.remove('selected'));
             
             const playerCard = document.getElementById(`player-card-${playerKey}`);
@@ -248,9 +248,7 @@
             playerCard.classList.add('active');
             avatar.classList.add('selected');
 
-            if (chartInstances[playerKey]) {
-                chartInstances[playerKey].destroy();
-            }
+            if (chartInstances[playerKey]) chartInstances[playerKey].destroy();
             createRadarChart(playerKey);
         }
 
@@ -260,6 +258,8 @@
             const maxValues = { 'DANO': 180, 'K/D': 1.5, 'HS%': 30, 'WIN%': 100 };
             const labels = Object.keys(data.stats);
             const normalizedData = labels.map(label => (data.stats[label] / maxValues[label]) * 100);
+            
+            const themeColor = playerData[playerKey].theme.color;
 
             chartInstances[playerKey] = new Chart(ctx, {
                 type: 'radar',
@@ -268,10 +268,10 @@
                     datasets: [{
                         label: data.name,
                         data: normalizedData,
-                        backgroundColor: 'rgba(255, 70, 85, 0.4)',
-                        borderColor: 'rgba(255, 70, 85, 1)',
+                        backgroundColor: `${themeColor}66`, // Cor com 40% de opacidade
+                        borderColor: themeColor,
                         borderWidth: 2,
-                        pointBackgroundColor: 'rgba(255, 70, 85, 1)',
+                        pointBackgroundColor: themeColor,
                         pointRadius: 4,
                     }]
                 },
@@ -293,24 +293,21 @@
 
         const loadingText = document.getElementById('loading-text');
         const startButton = document.getElementById('start-button');
-        const progressBar = document.getElementById('loading-progress-bar');
         const bootSequence = [
-            { text: "INICIANDO A.R.C. KERNEL...", duration: 1000 },
-            { text: "VERIFICANDO MÓDULOS...", duration: 800 },
-            { text: "CARREGANDO DADOS DOS OPERADORES...", duration: 1500 },
-            { text: "SISTEMA PRONTO. AGUARDANDO AUTORIZAÇÃO...", duration: 500 }
+            { text: "INICIANDO SISTEMA HOLOGRÁFICO...", duration: 1500 },
+            { text: "CALIBRANDO PROJETORES...", duration: 1000 },
+            { text: "CARREGANDO PERFIS DOS OPERADORES...", duration: 1500 },
+            { text: "PRONTO PARA INTERFACE.", duration: 500 }
         ];
         let currentStep = 0;
 
         function runBootSequence() {
             if (currentStep < bootSequence.length) {
                 loadingText.textContent = bootSequence[currentStep].text;
-                progressBar.style.width = ((currentStep + 1) / bootSequence.length) * 100 + '%';
                 setTimeout(runBootSequence, bootSequence[currentStep].duration);
                 currentStep++;
             } else {
                 startButton.style.display = 'block';
-                startButton.style.animation = 'pulse 1.5s infinite, fadeIn 0.5s forwards';
             }
         }
         runBootSequence();
@@ -318,7 +315,7 @@
         startButton.addEventListener('click', () => {
             const music = document.getElementById('background-music');
             music.volume = 0.3;
-            music.play();
+            music.play().catch(e => console.log("Autoplay bloqueado pelo navegador."));
 
             const loadingScreen = document.getElementById('loading-screen');
             loadingScreen.style.transition = 'opacity 0.5s';
@@ -329,10 +326,6 @@
                 showPlayer(Object.keys(playerData)[0]);
             }, 500);
         }, { once: true });
-
-        particlesJS('particles-js',
-            {"particles":{"number":{"value":60,"density":{"enable":true,"value_area":800}},"color":{"value":"#ffffff"},"shape":{"type":"circle"},"opacity":{"value":0.3,"random":true},"size":{"value":3,"random":true},"line_linked":{"enable":true,"distance":150,"color":"#ffffff","opacity":0.2,"width":1},"move":{"enable":true,"speed":1,"direction":"none","random":true,"straight":false,"out_mode":"out","bounce":false}},"interactivity":{},"retina_detect":true}
-        );
     });
   </script>
  </body>
