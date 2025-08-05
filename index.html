@@ -218,10 +218,36 @@
       height: 100%;
       clip-path: polygon(25% 0, 100% 0, 100% 100%, 0% 100%);
       position: relative;
+      overflow: hidden;
     }
     .player .visual img {
       width: 100%; height: 100%; object-fit: cover;
+      transition: filter 0.3s;
     }
+     .player .visual img.glitch {
+      animation: glitch 0.3s steps(2, end) forwards;
+    }
+    
+    @keyframes glitch {
+      0% {
+        clip-path: inset(89% 0 1% 0);
+        transform: translate(-10px, -5px);
+      }
+      10%, 30%, 50%, 70%, 90% {
+        clip-path: inset(45% 0 50% 0);
+        transform: translate(5px, 5px);
+      }
+      20%, 40%, 60%, 80% {
+        clip-path: inset(15% 0 80% 0);
+        transform: translate(-5px, 0px);
+      }
+      100% {
+        clip-path: inset(0 0 0 0);
+        transform: translate(0, 0);
+        opacity: 0;
+      }
+    }
+
     .player .visual::after {
         content: '';
         position: absolute; top: 0; left: 0;
@@ -239,13 +265,46 @@
       backdrop-filter: blur(8px);
       border: 1px solid rgba(255, 255, 255, 0.1);
       position: relative;
+      overflow: hidden;
     }
+    
+    .player .details::before {
+        content: '';
+        position: absolute;
+        top: -100%;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: var(--accent-color);
+        opacity: 0.5;
+        animation: detailScanline 4s linear infinite;
+    }
+    
+    @keyframes detailScanline {
+        to {
+            top: 150%;
+        }
+    }
+
     .player .name {
       font-size: 5em; color: var(--light-color); text-transform: uppercase;
       line-height: 1;
     }
     .player .name span { color: var(--accent-color); }
-    .player .agent { font-size: 1.8em; margin-top: 5px; letter-spacing: 2px; }
+    .player .agent { 
+        font-size: 1.8em; 
+        margin-top: 5px; 
+        letter-spacing: 2px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .class-icon {
+        width: 24px;
+        height: 24px;
+        margin-right: 10px;
+        fill: var(--light-color);
+    }
 
     .stats-container {
       display: grid; grid-template-columns: 1fr 1fr;
@@ -284,17 +343,57 @@
       background-size: cover; background-position: center;
       filter: saturate(0.5);
       clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      position: relative;
+      animation: bobbing 3s ease-in-out infinite;
     }
     .lineup-avatar:hover {
       transform: scale(1.1);
       filter: saturate(1);
       border-color: var(--light-color);
+      animation-play-state: paused;
     }
     .lineup-avatar.selected {
       transform: scale(1.15);
       border-color: var(--accent-color);
-      box-shadow: 0 0 20px var(--border-glow);
       filter: saturate(1.2);
+      animation: pulseGlow 2s infinite;
+    }
+    
+    .lineup-avatar.selected::before {
+        content: '';
+        position: absolute;
+        top: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-bottom: 8px solid var(--accent-color);
+        animation: fadeInTriangle 0.5s forwards;
+    }
+
+    @keyframes fadeInTriangle {
+        from { opacity: 0; top: -20px; }
+        to { opacity: 1; top: -15px; }
+    }
+    
+    @keyframes bobbing {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-4px);
+      }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% {
+        box-shadow: 0 0 20px var(--border-glow);
+      }
+      50% {
+        box-shadow: 0 0 30px var(--border-glow), 0 0 10px var(--accent-color);
+      }
     }
     
     .player-intro-popup {
@@ -385,7 +484,7 @@
             grid-template-columns: 1fr;
             height: auto;
             max-width: 500px;
-            margin-bottom: 100px; /* Space for lineup */
+            margin-bottom: 120px; /* Space for lineup */
         }
         .player .visual {
             height: 400px;
@@ -444,6 +543,23 @@
   </style>
 </head>
 <body>
+  <!-- SVG Icons for Agent Classes -->
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <symbol id="icon-duelist" viewBox="0 0 24 24">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5-10-5-10 5z"></path>
+      </symbol>
+      <symbol id="icon-sentinel" viewBox="0 0 24 24">
+        <path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.236L19.098 8 12 11.764 4.902 8 12 4.236zM4 9.618l8 4.572 8-4.572V17l-8 4-8-4V9.618z"></path>
+      </symbol>
+      <symbol id="icon-initiator" viewBox="0 0 24 24">
+        <path d="M4 12h16M4 12l6-6m-6 6l6 6"></path>
+      </symbol>
+      <symbol id="icon-controller" viewBox="0 0 24 24">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"></path>
+      </symbol>
+    </defs>
+  </svg>
 
   <div class="background-container"></div>
 
@@ -472,13 +588,13 @@
 
   <script>
     const playerData = {
-      marcinho: { name: 'Marcinho', agent: 'Sage', class: 'Sentinela', gif: 'https://64.media.tumblr.com/87434378350d5a44e9bbce6b094155e4/05082fe5ebb4ab2a-c0/s540x810/5305f9996c3e96b2760778ce198e88e1c05bb26d.gif', stats: { 'DANO': 125.8, 'K/D': 0.97, 'HS%': 12.1, 'WIN%': 48.0 }, abilities: { q: 'Orbe de Lentidão', e: 'Orbe Curativo', x: 'Ressurreição'}, theme: { color: '#44a383', bg: 'https://images.alphacoders.com/109/1095988.jpg' } },
-      nicemk:   { name: 'Nicemk', agent: 'Cypher', class: 'Sentinela', gif: 'https://media1.tenor.com/m/S52u7qmATOkAAAAC/cypher-cypher-valorant.gif', stats: { 'DANO': 163.6, 'K/D': 1.06, 'HS%': 16.6, 'WIN%': 47.1 }, abilities: { q: 'Jaula Cibernética', e: 'Câmera', x: 'Assalto Neural'}, theme: { color: '#d8b244', bg: 'https://images.alphacoders.com/108/1084222.png' } },
-      silence:  { name: 'Silence', agent: 'Sova', class: 'Iniciador', gif: 'https://media1.tenor.com/m/rkPKFm0AtvsAAAAC/sova-valorant.gif', stats: { 'DANO': 122.9, 'K/D': 0.94, 'HS%': 16.2, 'WIN%': 55.1 }, abilities: { q: 'Flecha de Choque', e: 'Flecha Rastreadora', x: 'Fúria do Caçador'}, theme: { color: '#3f93d1', bg: 'https://images.alphacoders.com/108/1084227.png' } },
-      mistyc:   { name: 'Mistyc', agent: 'Raze', class: 'Duelista', gif: 'https://media1.tenor.com/m/iHeaZNItkCMAAAAC/what-happened-raze.gif', stats: { 'DANO': 163.6, 'K/D': 1.06, 'HS%': 16.6, 'WIN%': 47.1 }, abilities: { q: 'Carga de Explosivos', e: 'Cartuchos de Tinta', x: 'Estraga-prazeres'}, theme: { color: '#f5923c', bg: 'https://images.alphacoders.com/112/1120023.jpg' } },
-      midora:   { name: 'Midora', agent: 'Jett', class: 'Duelista', gif: 'https://img3.pillowfort.social/posts/32ceda568b6203519e21.gif', stats: { 'DANO': 119.3, 'K/D': 0.80, 'HS%': 19.2, 'WIN%': 44.4 }, abilities: { q: 'Corrente Asc.', e: 'Brisa de Impulso', x: 'Tormenta de Aço'}, theme: { color: '#6e98ff', bg: 'https://images.alphacoders.com/111/1119567.jpg' } },
-      yuzuk:    { name: 'Yuzuk', agent: 'Skye', class: 'Iniciadora', gif: 'https://media1.tenor.com/m/4b3iXnTJRBkAAAAd/valorant-skye.gif', stats: { 'DANO': 117.4, 'K/D': 0.79, 'HS%': 26.0, 'WIN%': 61.5 }, abilities: { q: 'Predador Exp.', e: 'Luz Desbravadora', x: 'Rastreadores'}, theme: { color: '#68c56e', bg: 'https://images.alphacoders.com/112/1120021.jpg' } },
-      dark:     { name: 'Dark', agent: 'Omen', class: 'Controlador', gif: 'https://media1.tenor.com/m/gXZNSfLz1oIAAAAd/casting-paranoia-omen.gif', stats: { 'DANO': 162.5, 'K/D': 1.29, 'HS%': 18.7, 'WIN%': 42.9 }, abilities: { q: 'Paranoia', e: 'Manto Sombrio', x: 'Salto das Sombras'}, theme: { color: '#884da4', bg: 'https://images.alphacoders.com/108/1084224.png' } }
+      marcinho: { name: 'Marcinho', agent: 'Sage', class: 'Sentinela', classIcon: 'icon-sentinel', gif: 'https://64.media.tumblr.com/87434378350d5a44e9bbce6b094155e4/05082fe5ebb4ab2a-c0/s540x810/5305f9996c3e96b2760778ce198e88e1c05bb26d.gif', stats: { 'DANO': 125.8, 'K/D': 0.97, 'HS%': 12.1, 'WIN%': 48.0 }, abilities: { q: 'Orbe de Lentidão', e: 'Orbe Curativo', x: 'Ressurreição'}, theme: { color: '#44a383', bg: 'https://images.alphacoders.com/109/1095988.jpg' } },
+      nicemk:   { name: 'Nicemk', agent: 'Cypher', class: 'Sentinela', classIcon: 'icon-sentinel', gif: 'https://media1.tenor.com/m/S52u7qmATOkAAAAC/cypher-cypher-valorant.gif', stats: { 'DANO': 163.6, 'K/D': 1.06, 'HS%': 16.6, 'WIN%': 47.1 }, abilities: { q: 'Jaula Cibernética', e: 'Câmera', x: 'Assalto Neural'}, theme: { color: '#d8b244', bg: 'https://images.alphacoders.com/108/1084222.png' } },
+      silence:  { name: 'Silence', agent: 'Sova', class: 'Iniciador', classIcon: 'icon-initiator', gif: 'https://media1.tenor.com/m/rkPKFm0AtvsAAAAC/sova-valorant.gif', stats: { 'DANO': 122.9, 'K/D': 0.94, 'HS%': 16.2, 'WIN%': 55.1 }, abilities: { q: 'Flecha de Choque', e: 'Flecha Rastreadora', x: 'Fúria do Caçador'}, theme: { color: '#3f93d1', bg: 'https://images.alphacoders.com/108/1084227.png' } },
+      mistyc:   { name: 'Mistyc', agent: 'Raze', class: 'Duelista', classIcon: 'icon-duelist', gif: 'https://media1.tenor.com/m/iHeaZNItkCMAAAAC/what-happened-raze.gif', stats: { 'DANO': 163.6, 'K/D': 1.06, 'HS%': 16.6, 'WIN%': 47.1 }, abilities: { q: 'Carga de Explosivos', e: 'Cartuchos de Tinta', x: 'Estraga-prazeres'}, theme: { color: '#f5923c', bg: 'https://images.alphacoders.com/112/1120023.jpg' } },
+      midora:   { name: 'Midora', agent: 'Jett', class: 'Duelista', classIcon: 'icon-duelist', gif: 'https://img3.pillowfort.social/posts/32ceda568b6203519e21.gif', stats: { 'DANO': 119.3, 'K/D': 0.80, 'HS%': 19.2, 'WIN%': 44.4 }, abilities: { q: 'Corrente Asc.', e: 'Brisa de Impulso', x: 'Tormenta de Aço'}, theme: { color: '#6e98ff', bg: 'https://images.alphacoders.com/111/1119567.jpg' } },
+      yuzuk:    { name: 'Yuzuk', agent: 'Skye', class: 'Iniciadora', classIcon: 'icon-initiator', gif: 'https://media1.tenor.com/m/4b3iXnTJRBkAAAAd/valorant-skye.gif', stats: { 'DANO': 117.4, 'K/D': 0.79, 'HS%': 26.0, 'WIN%': 61.5 }, abilities: { q: 'Predador Exp.', e: 'Luz Desbravadora', x: 'Rastreadores'}, theme: { color: '#68c56e', bg: 'https://images.alphacoders.com/112/1120021.jpg' } },
+      dark:     { name: 'Dark', agent: 'Omen', class: 'Controlador', classIcon: 'icon-controller', gif: 'https://media1.tenor.com/m/gXZNSfLz1oIAAAAd/casting-paranoia-omen.gif', stats: { 'DANO': 162.5, 'K/D': 1.29, 'HS%': 18.7, 'WIN%': 42.9 }, abilities: { q: 'Paranoia', e: 'Manto Sombrio', x: 'Salto das Sombras'}, theme: { color: '#884da4', bg: 'https://images.alphacoders.com/108/1084224.png' } }
     };
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -498,6 +614,12 @@
       function showPlayer(playerKey) {
         data = playerData[playerKey];
         if (!data) return;
+
+        // Efeito Glitch
+        const currentPlayerVisual = document.querySelector('.player .visual img');
+        if (currentPlayerVisual) {
+            currentPlayerVisual.classList.add('glitch');
+        }
 
         // Remove pop-up anterior se houver
         const existingPopup = document.querySelector('.player-intro-popup');
@@ -557,7 +679,10 @@
                 </div>
                 <div class="details">
                   <div class="name">${data.name.slice(0,1)}<span>${data.name.slice(1)}</span></div>
-                  <div class="agent">${data.agent} // ${data.class}</div>
+                  <div class="agent">
+                    <svg class="class-icon"><use xlink:href="#${data.classIcon}"/></svg>
+                    ${data.agent} // ${data.class}
+                  </div>
                   <div class="stats-container">
                     <div class="chart-container">
                       <canvas id="statsChart"></canvas>
@@ -578,7 +703,7 @@
             }, 50);
 
             createStatsChart(data.stats, data.theme.color);
-        }, 250);
+        }, 300); // Atraso para o efeito glitch
 
 
         lineupAvatars.forEach(avatar => {
@@ -618,12 +743,31 @@
               borderWidth: 2,
               pointBackgroundColor: themeColor,
               pointRadius: 4,
+              pointHoverRadius: 6,
+              pointHoverBorderColor: '#fff',
+              pointHoverBackgroundColor: themeColor,
             }]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
+            plugins: { 
+                legend: { display: false },
+                tooltip: {
+                    enabled: true,
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            const statName = context.label;
+                            const originalValue = stats[statName];
+                            return `${statName}: ${originalValue}`;
+                        }
+                    }
+                }
+            },
             scales: {
               r: {
                 angleLines: { color: 'rgba(236, 232, 225, 0.2)' },
