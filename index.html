@@ -328,38 +328,42 @@
       width: 100%;
       transform: none;
       display: flex;
-      gap: 10px; z-index: 20;
+      gap: 15px; z-index: 20;
       background: rgba(10, 16, 24, 0.7);
-      padding: 10px;
+      padding: 15px;
       clip-path: none;
       justify-content: center;
       flex-wrap: wrap;
     }
 
-    .lineup-avatar {
-      width: 60px; height: 60px;
-      border: 2px solid rgba(236, 232, 225, 0.3);
-      cursor: pointer; transition: all 0.3s ease;
-      background-size: cover; background-position: center;
-      filter: saturate(0.5);
-      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-      position: relative;
-      animation: bobbing 3s ease-in-out infinite;
+    .lineup-item {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: pointer;
+        animation: bobbing 3s ease-in-out infinite;
+        transition: transform 0.3s ease;
     }
-    .lineup-avatar:hover {
-      transform: scale(1.1);
-      filter: saturate(1);
-      border-color: var(--light-color);
-      animation-play-state: paused;
+    .lineup-item:hover {
+        transform: scale(1.1);
+        animation-play-state: paused;
     }
-    .lineup-avatar.selected {
-      transform: scale(1.15);
-      border-color: var(--accent-color);
-      filter: saturate(1.2);
-      animation: pulseGlow 2s infinite;
+    .lineup-item.selected {
+        transform: scale(1.15);
+        animation: none;
     }
-    
-    .lineup-avatar.selected::before {
+    .lineup-item.selected .lineup-avatar {
+        border-color: var(--accent-color);
+        filter: saturate(1.2);
+        animation: pulseGlow 2s infinite;
+    }
+    .lineup-item.selected .lineup-name {
+        opacity: 1;
+        bottom: -25px;
+        color: var(--accent-color);
+    }
+    .lineup-item.selected::before {
         content: '';
         position: absolute;
         top: -15px;
@@ -371,6 +375,37 @@
         border-right: 8px solid transparent;
         border-bottom: 8px solid var(--accent-color);
         animation: fadeInTriangle 0.5s forwards;
+    }
+
+    .lineup-avatar {
+      width: 60px; height: 60px;
+      border: 2px solid rgba(236, 232, 225, 0.3);
+      background-size: cover; background-position: center;
+      filter: saturate(0.5);
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      transition: all 0.3s ease;
+    }
+    .lineup-item:hover .lineup-avatar {
+        filter: saturate(1);
+        border-color: var(--light-color);
+    }
+    
+    .lineup-name {
+        position: absolute;
+        bottom: -20px;
+        font-size: 0.8em;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        opacity: 0;
+        transition: opacity 0.3s ease, bottom 0.3s ease;
+        background: var(--dark-color);
+        padding: 2px 5px;
+        border-radius: 3px;
+        pointer-events: none;
+    }
+    .lineup-item:hover .lineup-name {
+        opacity: 1;
+        bottom: -25px;
     }
 
     @keyframes fadeInTriangle {
@@ -600,12 +635,23 @@
     document.addEventListener('DOMContentLoaded', () => {
       const lineupContainer = document.querySelector('.lineup');
       for (const key in playerData) {
+        const item = document.createElement('div');
+        item.classList.add('lineup-item');
+        item.dataset.player = key;
+        item.addEventListener('click', () => showPlayer(key));
+
         const avatar = document.createElement('div');
         avatar.classList.add('lineup-avatar');
-        avatar.dataset.player = key;
         avatar.style.backgroundImage = `url(${playerData[key].gif})`;
-        avatar.addEventListener('click', () => showPlayer(key));
-        lineupContainer.appendChild(avatar);
+        
+        const nameSpan = document.createElement('span');
+        nameSpan.classList.add('lineup-name');
+        nameSpan.textContent = playerData[key].name;
+
+        item.appendChild(avatar);
+        item.appendChild(nameSpan);
+        
+        lineupContainer.appendChild(item);
       }
 
       let currentChart = null;
@@ -614,7 +660,7 @@
       function showPlayer(playerKey) {
         data = playerData[playerKey];
         if (!data) return;
-
+        
         // Efeito Glitch
         const currentPlayerVisual = document.querySelector('.player .visual img');
         if (currentPlayerVisual) {
@@ -652,7 +698,7 @@
         }, 1800);
 
         const container = document.querySelector('.player-details-container');
-        const lineupAvatars = document.querySelectorAll('.lineup-avatar');
+        const lineupItems = document.querySelectorAll('.lineup-item');
         const root = document.documentElement;
         
         const clickSound = document.getElementById('click-sound');
@@ -703,13 +749,13 @@
             }, 50);
 
             createStatsChart(data.stats, data.theme.color);
-        }, 300); // Atraso para o efeito glitch
+        }, 300);
 
 
-        lineupAvatars.forEach(avatar => {
-          avatar.classList.remove('selected');
-          if (avatar.dataset.player === playerKey) {
-            avatar.classList.add('selected');
+        lineupItems.forEach(item => {
+          item.classList.remove('selected');
+          if (item.dataset.player === playerKey) {
+            item.classList.add('selected');
           }
         });
       }
